@@ -12,7 +12,9 @@ except:
 
 import numpy as np
 
-def navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel):
+def navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel) -> None:
+    ''' comentario sobre a função '''
+
     v = 0
     w = np.deg2rad(0)
 

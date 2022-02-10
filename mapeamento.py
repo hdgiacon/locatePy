@@ -1,10 +1,15 @@
-import imp
 import math
 import numpy as np
+import typing as ty
 
 from auxiliares import get_line
 
-def ocuppance_grid(raw_range_data, raw_angle_data, theta, posX, posY, RANGE_MAX, RANGE_LIMIT, RES, LARGGRID, ALTGRID, rows, cols, posXGrid, posYGrid, m, PRIORI):
+
+def ocuppance_grid(raw_range_data: ty.List, raw_angle_data: ty.List, theta: int, posX: int, posY: int, 
+    RANGE_MAX: int, RANGE_LIMIT: int, RES: float, LARGGRID: int, ALTGRID: int, rows: int, 
+    cols: int, posXGrid: int, posYGrid: int, m: np.float, PRIORI: float) -> None:
+    ''' comentario sobre a função '''
+
     for i in range(len(raw_range_data)):
         # inverse sensor model
         if raw_range_data[i] < RANGE_MAX * RANGE_LIMIT:
@@ -65,5 +70,3 @@ def ocuppance_grid(raw_range_data, raw_angle_data, theta, posX, posY, RANGE_MAX,
                 taxaOC = 0.48
             else:
                 taxaOC = 0.95
-
-            # retornar a matriz m?

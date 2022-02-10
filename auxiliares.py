@@ -9,11 +9,14 @@ except:
     print('--------------------------------------------------------------')
     print('')
 
-import numpy as np
-import matplotlib.pyplot as plt
+#import numpy as np
+#import matplotlib.pyplot as plt
+import typing as ty
 
 ### retorna a distancia e o angulo do sensor
-def readSensorData(clientId=-1, range_data_signal_id="hokuyo_range_data", angle_data_signal_id="hokuyo_angle_data"):
+def readSensorData(clientId=-1, range_data_signal_id: str = "hokuyo_range_data", 
+    angle_data_signal_id: str = "hokuyo_angle_data"):
+    ''' comentario sobre a função '''
 
     # a primeira chamada deve ser sem blocking para evitar a obtenção de dados de ângulo fora de sincronia
     returnCodeRanges, string_range_data = sim.simxGetStringSignal(clientId, range_data_signal_id, sim.simx_opmode_streaming)
@@ -36,45 +39,24 @@ def readSensorData(clientId=-1, range_data_signal_id="hokuyo_range_data", angle_
     return None
 
 
-def draw_laser_data(laser_data, max_sensor_range=5):
-    fig = plt.figure(figsize=(6, 6), dpi=100)
-    ax = fig.add_subplot(111, aspect='equal')
-
-    for i in range(len(laser_data)):
-        ang, dist = laser_data[i]
-
-        # Quando o feixe não acerta nada, retorna o valor máximo (definido na simulação)
-        # Logo, usar um pequeno limiar do máximo para considerar a leitura
-        if (max_sensor_range - dist) > 0.1:
-            x = dist * np.cos(ang)
-            y = dist * np.sin(ang)
-            c = 'r'
-            if ang < 0:
-                c = 'b'
-            ax.plot(x, y, 'o', color=c)
-
-    ax.plot(0, 0, 'k>', markersize=10)
-    # plt.plot(x, y)
-    plt.show()
-
-    ax.grid()
-    ax.set_xlim([-max_sensor_range, max_sensor_range])
-    ax.set_ylim([-max_sensor_range, max_sensor_range])
-
 
 ### retorna uma lista de tuplas com as coordenadas de um ponto inicial a um ponto final
-def get_line(start, end):
+def get_line(start: int, end: int) -> ty.List:
+    '''
+    Bresenham's Line Algorithm
+    
+    Produces a list of tuples from start and end
 
-    # Bresenham's Line Algorithm
-    # Produces a list of tuples from start and end
-    #
-    # >>> points1 = get_line((0, 0), (3, 4))
-    # >>> points2 = get_line((3, 4), (0, 0))
-    # >>> assert(set(points1) == set(points2))
-    # >>> print points1
-    # [(0, 0), (1, 1), (1, 2), (2, 3), (3, 4)]
-    # >>> print points2
-    # [(3, 4), (2, 3), (1, 2), (1, 1), (0, 0)]
+    >>> points1 = get_line((0, 0), (3, 4))
+    >>> points2 = get_line((3, 4), (0, 0))
+    >>> assert(set(points1) == set(points2))
+    >>> print points1
+    [(0, 0), (1, 1), (1, 2), (2, 3), (3, 4)]
+    >>> print points2
+    [(3, 4), (2, 3), (1, 2), (1, 1), (0, 0)]
+
+    '''
+    
 
     # Setup initial conditions
     x1, y1 = start
@@ -121,4 +103,5 @@ def get_line(start, end):
     # Reverse the list if the coordinates were swapped
     if swapped:
         points.reverse()
+
     return points
