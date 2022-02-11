@@ -30,6 +30,19 @@ from auxiliares import readSensorData
     # plotar o trajeto do monte carlo e do robo real (coppelia)
     # plotar um grafico de linha sobre a diferença da distancia do MT e a distancia real
 
+    # como os pseudo codigos tem muitos simbolos, tem como fazer uma tabela de simbolos no tcc?
+
+
+    # criar uma lista de robos virtuais(objetos) e aleatorizar as suas posições
+    # pegar a posição inicial e final de cada feixe de laser e o angulo, pra replicar em cada feixe dos robos virtuais
+    # aplicar Bresenham nesses pontos
+    # percorrer a lista de celulas, onde a celula estiver ocupada, é onde o feixe do laser termina (bateu)
+    # gerar um peso local baseado na distancia de cada feixe virtual e real, esquema de proporção
+    # depois fazer um peso global mediante aos pesos locais
+
+    # na reamostragem, descartar um numero n de particulas com os piores pesos
+    # adicionar na lista de particulas n/2 particulas aleatorias
+    # adicionar na lista n/2 particulas mediante as boas (esquema da roleta)
 
 
 '''     Inicio definição das constantes, parâmetros e do mapa<Grid>     '''
@@ -157,6 +170,7 @@ def main() -> None:
             '''     Navegação -> base    '''
 
             navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel)
+
 
 
             tempo = tempo + dt
