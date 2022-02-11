@@ -9,14 +9,14 @@ except:
     print('--------------------------------------------------------------')
     print('')
 
-#import numpy as np
-#import matplotlib.pyplot as plt
+
+
 import typing as ty
 
-### retorna a distancia e o angulo do sensor
+### 
 def readSensorData(clientId=-1, range_data_signal_id: str = "hokuyo_range_data", 
-    angle_data_signal_id: str = "hokuyo_angle_data"):
-    ''' comentario sobre a função '''
+    angle_data_signal_id: str = "hokuyo_angle_data") -> 'tuple[ty.List, ty.list]' or None:
+    ''' retorna a distancia e o angulo de cada sensor do robô '''
 
     # a primeira chamada deve ser sem blocking para evitar a obtenção de dados de ângulo fora de sincronia
     returnCodeRanges, string_range_data = sim.simxGetStringSignal(clientId, range_data_signal_id, sim.simx_opmode_streaming)

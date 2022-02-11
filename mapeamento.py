@@ -6,7 +6,7 @@ from auxiliares import get_line
 
 
 def ocuppance_grid(raw_range_data: ty.List, raw_angle_data: ty.List, theta: int, posX: int, posY: int, 
-    RANGE_MAX: int, RANGE_LIMIT: int, RES: float, LARGGRID: int, ALTGRID: int, rows: int, 
+    RANGE_MAX: int, RANGE_LIMIT: int, RES: float, LARG_GRID: int, ALT_GRID: int, rows: int, 
     cols: int, posXGrid: int, posYGrid: int, m: np.float, PRIORI: float) -> None:
     ''' comentario sobre a função '''
 
@@ -23,18 +23,18 @@ def ocuppance_grid(raw_range_data: ty.List, raw_angle_data: ty.List, theta: int,
         # posX e posY são as coordenadas do robô no ambiente
 
         # Conversão da posição de onde o laser bateu no ambiente para a Grid
-        xLGrid = int((xL / RES) + (LARGGRID / 2))
-        yLGrid = int(ALTGRID - ((yL / RES) + (ALTGRID / 2)))
+        xLGrid = int((xL / RES) + (LARG_GRID / 2))
+        yLGrid = int(ALT_GRID - ((yL / RES) + (ALT_GRID / 2)))
 
         if xLGrid < 0:
             xLGrid = 0
-        elif xLGrid >= LARGGRID:
-            xLGrid = LARGGRID-1
+        elif xLGrid >= LARG_GRID:
+            xLGrid = LARG_GRID-1
 
         if yLGrid < 0:
             yLGrid = 0
-        elif yLGrid >= ALTGRID:
-            yLGrid = ALTGRID-1
+        elif yLGrid >= ALT_GRID:
+            yLGrid = ALT_GRID-1
 
         # Cálculo de todas as células de acordo com o algoritmo de Bresenham
         line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
@@ -56,13 +56,13 @@ def ocuppance_grid(raw_range_data: ty.List, raw_angle_data: ty.List, theta: int,
 
             if linha < 0:
                 linha = 0
-            elif linha >= LARGGRID:
-                linha = LARGGRID-1
+            elif linha >= LARG_GRID:
+                linha = LARG_GRID-1
 
             if coluna < 0:
                 coluna = 0
-            elif coluna >= ALTGRID:
-                coluna = ALTGRID-1
+            elif coluna >= ALT_GRID:
+                coluna = ALT_GRID-1
 
             m[linha, coluna] = 1 - pow(1 + (taxaOC/(1 - taxaOC)) * ((1 - PRIORI)/PRIORI) * (m[linha, coluna]/(1 - m[linha, coluna] + 0.00001)), -1) + 0.00001
 
