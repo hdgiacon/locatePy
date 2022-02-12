@@ -1,22 +1,20 @@
 from random import randint
 import typing as ty
-import numpy as np
-import math
-from auxiliares import get_line
+from auxiliares import get_line, convertion_points
 
 class RoboVirtual:
-    def __init__(self, _posX: int, _posY: int, _pesosLocais: ty.List, _pesoGlobal: float) -> None:
+    def __init__(self, _posX: int, _posY: int, _pesoGlobal: float) -> None:
         self.posX = _posX
         self.posY = _posY
-        self.pesosLocais = _pesosLocais
         self.pesoGlobal = _pesoGlobal
         
 
 def monteCarlo(num_particles: int, alt_grid: int, larg_grid: int, raw_range_data: ty.List, raw_angle_data: ty.List, 
-    theta: int, RES: float, LARG_GRID: int, ALT_GRID: int, posXGrid: int, posYGrid: int, rows: int, cols: int) -> ty.List:
+    theta: int, RES: float, LARG_GRID: int, ALT_GRID: int, posXGrid: int, posYGrid: int, rows: int, cols: int) -> ty.List[RoboVirtual]:
     ''' comentario sobre monte carlo '''
 
-    conjAmostrasX: ty.List = []
+    conjAmostrasX: ty.List[RoboVirtual] = []
+    pesosLocais: ty.List[int] = []
     k: int = 0
 
     #for k in num_particles:
@@ -39,52 +37,35 @@ def monteCarlo(num_particles: int, alt_grid: int, larg_grid: int, raw_range_data
         )
 
         # fazer isso pro numero de feixes de lasers
-        for n in len(raw_range_data):
-            xL = math.cos(raw_angle_data[k] + theta) * raw_range_data[k] + conjAmostrasX[k].posX
-            yL = math.sin(raw_angle_data[k] + theta) * raw_range_data[k] + conjAmostrasX[k].posY
+        for _ in range(len(raw_range_data)):
+            # bresenham para um feixe de laser do robo real
+            point1_r, point2_r = convertion_points()
 
+            path_r = get_line(point1_r, point2_r)
+            
+            # bresenham para um feixe de laser do robo virtual
+            point1_v, point2_v = convertion_points(raw_range_data, raw_angle_data, theta, conjAmostrasX[k].posX, 
+            conjAmostrasX[k].posY, k, RES, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
 
-            # Conversão da posição de onde o laser bateu no ambiente para a Grid
-            xLGrid = int((xL / RES) + (LARG_GRID / 2))
-            yLGrid = int(ALT_GRID - ((yL / RES) + (ALT_GRID / 2)))
-
-            if xLGrid < 0:
-                xLGrid = 0
-            elif xLGrid >= LARG_GRID:
-                xLGrid = LARG_GRID-1
-
-            if yLGrid < 0:
-                yLGrid = 0
-            elif yLGrid >= ALT_GRID:
-                yLGrid = ALT_GRID-1
-
-            # Cálculo de todas as células de acordo com o algoritmo de Bresenham
-            #line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
-
-            xi = posXGrid
-            yi = posYGrid
-            xoi = xLGrid
-            yoi = yLGrid
-            # x é coluna; y é linha
-            # rr, cc = line(yi, xi, yoi, xoi)  # r0, c0, r1, c1
-            point1 = (yi, xi)
-            point2 = (yoi, xoi)
-            #cells = get_line(point1, point2)
-
-            path = get_line(point1, point2)
+            path_v = get_line(point1_v, point2_v)
 
             contPesoLocal: int = 0
-            for m in path:
+            for m in path_v:
                 contPesoLocal += 1
                 if m >= 0.8:
                     break
 
-            if contPesoLocal == len(path):
+            if contPesoLocal == len(path_r):
                 # atribuir peso caso forem iguais
-                pass
+                pesosLocais.append(0)
             else:
                 # calculo do peso local caso não sejam iguais
-                pass
+                pesosLocais.append(abs(contPesoLocal - len(path_r)))
+
+        # calcular o peso global - media (quanto mais proximo de 0 mais proximo o robo virtual está de um robo real)
+        conjAmostrasX[k].pesoGlobal = sum(pesosLocais) / len(pesosLocais)
+
+        pesosLocais.clear
 
 
     for k in num_particles:

@@ -12,6 +12,7 @@ except:
 
 
 import typing as ty
+import math
 
 ### 
 def readSensorData(clientId=-1, range_data_signal_id: str = "hokuyo_range_data", 
@@ -41,7 +42,7 @@ def readSensorData(clientId=-1, range_data_signal_id: str = "hokuyo_range_data",
 
 
 ### retorna uma lista de tuplas com as coordenadas de um ponto inicial a um ponto final
-def get_line(start: int, end: int) -> ty.List:
+def get_line(start: int, end: int) -> ty.List[ty.Tuple[int, int]]:
     '''
     Bresenham's Line Algorithm
     
@@ -105,3 +106,40 @@ def get_line(start: int, end: int) -> ty.List:
         points.reverse()
 
     return points
+
+def convertion_points(raw_range_data: ty.List, raw_angle_data: ty.List, theta: float, posX: int, posY: int, k: int, RES: float, 
+    ALT_GRID: int, LARG_GRID: int, posXGrid: int, posYGrid: int) -> int and int:
+    ''' comentario sobre a função '''
+    
+    xL = math.cos(raw_angle_data[k] + theta) * raw_range_data[k] + posX
+    yL = math.sin(raw_angle_data[k] + theta) * raw_range_data[k] + posY
+
+
+    # Conversão da posição de onde o laser bateu no ambiente para a Grid
+    xLGrid = int((xL / RES) + (LARG_GRID / 2))
+    yLGrid = int(ALT_GRID - ((yL / RES) + (ALT_GRID / 2)))
+
+    if xLGrid < 0:
+        xLGrid = 0
+    elif xLGrid >= LARG_GRID:
+        xLGrid = LARG_GRID-1
+
+    if yLGrid < 0:
+        yLGrid = 0
+    elif yLGrid >= ALT_GRID:
+        yLGrid = ALT_GRID-1
+
+    # Cálculo de todas as células de acordo com o algoritmo de Bresenham
+    #line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
+
+    xi = posXGrid
+    yi = posYGrid
+    xoi = xLGrid
+    yoi = yLGrid
+    # x é coluna; y é linha
+    # rr, cc = line(yi, xi, yoi, xoi)  # r0, c0, r1, c1
+    point1 = (yi, xi)
+    point2 = (yoi, xoi)
+    #cells = get_line(point1, point2)
+
+    return point1, point2
