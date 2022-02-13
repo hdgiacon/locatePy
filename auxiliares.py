@@ -11,12 +11,11 @@ except:
 
 
 
-import typing as ty
 import math
 
 ### 
 def readSensorData(clientId=-1, range_data_signal_id: str = "hokuyo_range_data", 
-    angle_data_signal_id: str = "hokuyo_angle_data") -> 'tuple[ty.List, ty.list]' or None:
+    angle_data_signal_id: str = "hokuyo_angle_data") -> 'tuple[list, list]' or None:
     ''' retorna a distancia e o angulo de cada sensor do robô '''
 
     # a primeira chamada deve ser sem blocking para evitar a obtenção de dados de ângulo fora de sincronia
@@ -42,7 +41,7 @@ def readSensorData(clientId=-1, range_data_signal_id: str = "hokuyo_range_data",
 
 
 ### retorna uma lista de tuplas com as coordenadas de um ponto inicial a um ponto final
-def get_line(start: int, end: int) -> ty.List[ty.Tuple[int, int]]:
+def get_line(start: int, end: int) -> 'list[tuple[int, int]]':
     '''
     Bresenham's Line Algorithm
     
@@ -107,7 +106,7 @@ def get_line(start: int, end: int) -> ty.List[ty.Tuple[int, int]]:
 
     return points
 
-def convertion_points(raw_range_data: ty.List, raw_angle_data: ty.List, theta: float, posX: int, posY: int, k: int, RES: float, 
+def convertion_points(raw_range_data: list, raw_angle_data: list, theta: float, posX: int, posY: int, k: int, RES: float, 
     ALT_GRID: int, LARG_GRID: int, posXGrid: int, posYGrid: int) -> int and int:
     ''' comentario sobre a função '''
     

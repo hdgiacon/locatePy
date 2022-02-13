@@ -1,25 +1,74 @@
 from random import randint
-import typing as ty
+from operator import attrgetter
 from auxiliares import get_line, convertion_points
 
 class RoboVirtual:
+    ''' comentario sobre a classe '''
     def __init__(self, _posX: int, _posY: int, _pesoGlobal: float) -> None:
         self.posX = _posX
         self.posY = _posY
         self.pesoGlobal = _pesoGlobal
-        
 
-def monteCarlo(num_particles: int, alt_grid: int, larg_grid: int, raw_range_data: ty.List, raw_angle_data: ty.List, 
-    theta: int, RES: float, LARG_GRID: int, ALT_GRID: int, posXGrid: int, posYGrid: int, rows: int, cols: int) -> ty.List[RoboVirtual]:
+
+def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', raw_range_data: list, raw_angle_data: list, theta: int, k: int, 
+    RES: float, ALT_GRID: int, LARG_GRID: int, posXGrid: int, posYGrid: int, larg_grid:int , alt_grid: int) -> 'list[RoboVirtual]':
+    ''' comentario sobre a função '''
+    
+    pesosLocais: list[int] = []
+
+    conjAmostrasX.append(
+        RoboVirtual(
+            randint(0, larg_grid), 
+            randint(0, alt_grid),
+            0.0
+        )
+    )
+
+    # fazer isso pro numero de feixes de lasers
+    for _ in range(len(raw_range_data)):
+        # bresenham para um feixe de laser do robo real
+        point1_r, point2_r = convertion_points()
+
+        path_r = get_line(point1_r, point2_r)
+        
+        # bresenham para um feixe de laser do robo virtual
+        point1_v, point2_v = convertion_points(raw_range_data, raw_angle_data, theta, conjAmostrasX[k].posX, 
+        conjAmostrasX[k].posY, k, RES, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
+
+        path_v = get_line(point1_v, point2_v)
+
+        contPesoLocal: int = 0
+        for m in path_v:
+            contPesoLocal += 1
+            if m >= 0.8:
+                break
+
+        if contPesoLocal == len(path_r):
+            # atribuir peso caso forem iguais
+            pesosLocais.append(0)
+        else:
+            # calculo do peso local caso não sejam iguais
+            pesosLocais.append(abs(contPesoLocal - len(path_r)))
+
+    # calcular o peso global - media (quanto mais proximo de 0 mais proximo o robo virtual está de um robo real)
+    conjAmostrasX[k].pesoGlobal = sum(pesosLocais) / len(pesosLocais)
+
+    pesosLocais.clear
+
+    return conjAmostrasX
+    
+
+def monteCarlo(num_particles: int, alt_grid: int, larg_grid: int, raw_range_data: list, raw_angle_data: list, 
+    theta: int, RES: float, LARG_GRID: int, ALT_GRID: int, posXGrid: int, posYGrid: int) -> 'list[RoboVirtual]':
     ''' comentario sobre monte carlo '''
 
-    conjAmostrasX: ty.List[RoboVirtual] = []
-    pesosLocais: ty.List[int] = []
+    conjAmostrasX: list[RoboVirtual] = []
+    
     k: int = 0
 
     #for k in num_particles:
         # predição
-        # 𝑥_𝑡 ← 𝑠𝑎𝑚𝑝𝑙𝑒_𝑚𝑜𝑡𝑖𝑜𝑛_𝑚𝑜𝑑𝑒𝑙(𝑢_𝑡 , 𝑥_{𝑡−1} ) // aplica a movimentação em cada amostra 𝑥^𝑘_𝑡
+        # 𝑥_𝑡 ← 𝑠𝑎𝑚𝑝𝑙𝑒_𝑚𝑜𝑡𝑖𝑜𝑛_𝑚𝑜𝑑𝑒𝑙(𝑢_𝑡 , 𝑥_{𝑡−1}) // aplica a movimentação em cada amostra 𝑥^𝑘_𝑡
 
         # atualização
         # 𝑚𝑒𝑎𝑠𝑢𝑟𝑒𝑚𝑒𝑛𝑡_𝑚𝑜𝑑𝑒𝑙(𝑧_𝑡 , 𝑥_𝑡 , 𝑚) // aplica o modelo de observação atribuindo peso 𝜔_𝑡
@@ -27,52 +76,26 @@ def monteCarlo(num_particles: int, alt_grid: int, larg_grid: int, raw_range_data
     #    pass
 
     for k in num_particles:
-        conjAmostrasX.append(
-            RoboVirtual(
-                randint(0, larg_grid), 
-                randint(0, alt_grid),
-                [],
-                0.0
-            )
-        )
-
-        # fazer isso pro numero de feixes de lasers
-        for _ in range(len(raw_range_data)):
-            # bresenham para um feixe de laser do robo real
-            point1_r, point2_r = convertion_points()
-
-            path_r = get_line(point1_r, point2_r)
-            
-            # bresenham para um feixe de laser do robo virtual
-            point1_v, point2_v = convertion_points(raw_range_data, raw_angle_data, theta, conjAmostrasX[k].posX, 
-            conjAmostrasX[k].posY, k, RES, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
-
-            path_v = get_line(point1_v, point2_v)
-
-            contPesoLocal: int = 0
-            for m in path_v:
-                contPesoLocal += 1
-                if m >= 0.8:
-                    break
-
-            if contPesoLocal == len(path_r):
-                # atribuir peso caso forem iguais
-                pesosLocais.append(0)
-            else:
-                # calculo do peso local caso não sejam iguais
-                pesosLocais.append(abs(contPesoLocal - len(path_r)))
-
-        # calcular o peso global - media (quanto mais proximo de 0 mais proximo o robo virtual está de um robo real)
-        conjAmostrasX[k].pesoGlobal = sum(pesosLocais) / len(pesosLocais)
-
-        pesosLocais.clear
-
+        conjAmostrasX = create_virtual_robot(conjAmostrasX, raw_range_data, raw_angle_data, theta, k, RES, ALT_GRID, LARG_GRID, 
+        posXGrid, posYGrid, larg_grid, alt_grid)
+        
 
     for k in num_particles:
         # reamostragem
         # 𝑑𝑟𝑎𝑤 𝑖 𝑤𝑖𝑡ℎ 𝑝𝑟𝑜𝑏𝑎𝑏𝑖𝑙𝑖𝑡𝑦 ∝ 𝑤_𝑡^{[i]} selecionar as amostras 𝑥^𝑘_𝑡 que possuem maior peso 𝜔_𝑡^𝑘
         # 𝑋_𝑡 ∪ 𝑥_𝑡 // adiciona a 𝑋_𝑡 as amostras de maior peso
-        pass
+
+        for _ in num_particles / 2:
+            # remove o elemento de maior peso -> quanto maior, mais diferente é do feixe original
+            conjAmostrasX.pop(max(range(len(conjAmostrasX)), key = attrgetter('pesoGlobal')))
+
+        # adicionar na lista n/2 particulas mediante as boas (esquema da roleta)
+        for _ in num_particles / 4:
+            pass
+
+        # adicionar na lista de particulas n/2 particulas aleatorias
+        for _ in num_particles / 4:
+            pass
 
     # 𝑟𝑒𝑡𝑜𝑟𝑛𝑒 𝑋_𝑡
     return conjAmostrasX 

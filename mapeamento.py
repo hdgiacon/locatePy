@@ -1,11 +1,9 @@
-import math
 import numpy as np
-import typing as ty
 
 from auxiliares import get_line, convertion_points
 
 
-def ocuppance_grid(raw_range_data: ty.List, raw_angle_data: ty.List, theta: int, posX: int, posY: int, 
+def ocuppance_grid(raw_range_data: list, raw_angle_data: list, theta: int, posX: int, posY: int, 
     RANGE_MAX: int, RANGE_LIMIT: int, RES: float, LARG_GRID: int, ALT_GRID: int, rows: int, 
     cols: int, posXGrid: int, posYGrid: int, m: np.float, PRIORI: float) -> None:
     ''' comentario sobre a função '''
