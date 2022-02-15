@@ -13,7 +13,7 @@ except:
 
 import math
 
-### 
+
 def readSensorData(clientId=-1, range_data_signal_id: str = "hokuyo_range_data", 
     angle_data_signal_id: str = "hokuyo_angle_data") -> 'tuple[list, list]' or None:
     ''' retorna a distancia e o angulo de cada sensor do robô '''

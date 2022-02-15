@@ -30,8 +30,6 @@ from auxiliares import readSensorData
     # plotar o trajeto do monte carlo e do robo real (coppelia)
     # plotar um grafico de linha sobre a diferença da distancia do MT e a distancia real
 
-    # como os pseudo codigos tem muitos simbolos, tem como fazer uma tabela de simbolos no tcc?
-
 
     # criar uma lista de robos virtuais(objetos) e aleatorizar as suas posições
     # pegar a posição inicial e final de cada feixe de laser e o angulo, pra replicar em cada feixe dos robos virtuais
