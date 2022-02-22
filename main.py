@@ -14,14 +14,7 @@ except:
 
 
 
-import numpy as np
-import matplotlib.pyplot as plt
-import time
-import typing as ty
 
-from mapeamento import ocuppance_grid
-from navegacao import navegacao_base
-from auxiliares import readSensorData
 
 
 
@@ -43,35 +36,49 @@ from auxiliares import readSensorData
     # adicionar na lista n/2 particulas mediante as boas (esquema da roleta)
 
 
-'''     Inicio definição das constantes, parâmetros e do mapa<Grid>     '''
+import numpy as np
+import matplotlib.pyplot as plt
+import time
 
-LARG_GRID: ty.Final = 1000
-ALT_GRID: ty.Final = 1000
-COEF_PROPOR: ty.Final = 0.015
-RANGE_MAX: ty.Final = 5
-RANGE_LIMIT: ty.Final = 0.3
-PRIORI: ty.Final = 0.5
-CELL_SIZE: ty.Final = 1
-
-fig = plt.figure(figsize=(8, 8), dpi=100)
-ax = fig.add_subplot(111, aspect='equal')
-
-map_size = np.array([LARG_GRID, ALT_GRID])
-
-
-rows, cols = (map_size / CELL_SIZE).astype(int)
-
-map = np.random.uniform(low=0.0, high=1.0, size=(rows, cols))
-# inicialização das células da grid com valor de probabilidade desconhecido
-map[::, ::] = PRIORI
-
-# a primeira e última célula são inicializadas para que o valor 0.5 seja o intermediário e a matriz toda cinza
-map[0, 0] = 1
-map[LARG_GRID-1, ALT_GRID-1] = 0
+from mapeamento import ocuppance_grid
+from monte_carlo import RoboVirtual, monteCarlo
+from navegacao import navegacao_base
+from auxiliares import readSensorData
+from monte_carlo import create_virtual_robot
 
 
 
-def main() -> None:
+def main(numParticles: int, numReamostragens: int) -> None:
+
+    import typing as ty
+
+    '''     Inicio definição das constantes, parâmetros e do mapa<Grid>     '''
+
+    LARG_GRID: ty.Final and int = numParticles
+    ALT_GRID: ty.Final and int = numParticles
+    COEF_PROPOR: ty.Final and float = 15 / numParticles
+    RANGE_MAX: ty.Final and int = 5
+    RANGE_LIMIT: ty.Final and float = 0.3
+    PRIORI: ty.Final and float = 0.5
+    CELL_SIZE: ty.Final and int = 1
+
+    fig = plt.figure(figsize=(8, 8), dpi=100)
+    ax = fig.add_subplot(111, aspect='equal')
+
+    map_size = np.array([LARG_GRID, ALT_GRID])
+
+
+    rows, cols = (map_size / CELL_SIZE).astype(int)
+
+    map = np.random.uniform(low=0.0, high=1.0, size=(rows, cols))
+    # inicialização das células da grid com valor de probabilidade desconhecido
+    map[::, ::] = PRIORI
+
+    # a primeira e última célula são inicializadas para que o valor 0.5 seja o intermediário e a matriz toda cinza
+    map[0, 0] = 1
+    map[LARG_GRID-1, ALT_GRID-1] = 0
+
+
 
     print('Program started')
     sim.simxFinish(-1)  # just in case, close all opened connections
@@ -125,16 +132,16 @@ def main() -> None:
         # # print('QUANTIDADE DE LEITURAS: ', len(laser_data))
 
         # Dados do Pioneer
-        L = 0.381  # Metros
-        r = 0.0975  # Metros
+        L: ty.Final and float = 0.381  # Metros
+        r: ty.Final and float = 0.0975  # Metros
 
-        tempo = 0
+        tempo: int = 0
         # Lembrar de habilitar o 'Real-time mode'
         startTime = time.time()
         lastTime = startTime
         dt = 0
         i = 0
-        while tempo < 240:
+        while tempo < numReamostragens:
             now = time.time()
             dt = now - lastTime
 
@@ -162,7 +169,7 @@ def main() -> None:
             '''     Mapeamento -> Occupance Grid     '''
             
             ocuppance_grid(raw_range_data, raw_angle_data, theta, posX, posY, RANGE_MAX, RANGE_LIMIT, 
-                COEF_PROPOR, LARG_GRID, ALT_GRID, rows, cols, posXGrid, posYGrid, map, PRIORI)
+                COEF_PROPOR, LARG_GRID, ALT_GRID, posXGrid, posYGrid, map, PRIORI)
 
 
             '''     Navegação -> base    '''
@@ -175,7 +182,10 @@ def main() -> None:
             i = i + 1
             lastTime = now
 
-        # end while
+        # end while <geração do mapa>
+
+        
+
 
         # Parando o robô
         sim.simxSetJointTargetVelocity(clientID, r_wheel, 0, sim.simx_opmode_oneshot_wait)
@@ -196,4 +206,78 @@ def main() -> None:
     print('Program ended')
 
 
-main()
+main(1000, 240)
+
+
+'''
+# criar n particulas
+        for k in range(numParticles):
+            conjAmostrasX = create_virtual_robot(conjAmostrasX, raw_range_data, raw_angle_data, theta, k, res, ALT_GRID, LARG_GRID, 
+                posXGrid, posYGrid, LARG_GRID, ALT_GRID, posX, posY)
+
+        # fazer um while igual o acima, sem o mapeamento
+            # fazer a reamostragem nesse laço
+            # ordenar o vetor de particulas de forma crescente
+
+            # pegar o maior peso e adicionar em uma lista
+            # pegar a posição real do robo e colocar em outra lista
+
+        conjAmostrasX: list[RoboVirtual] = []
+        path_real: list[tuple[int,int]] = []
+        path_monte_carlo: list[tuple[int,int]] = []
+
+        tempo: int = 0
+        # Lembrar de habilitar o 'Real-time mode'
+        startTime = time.time()
+        lastTime = startTime
+        dt = 0
+        i = 0
+        while tempo < numReamostragens:
+            now = time.time()
+            dt = now - lastTime
+
+            # Fazendo leitura do laser
+            raw_range_data, raw_angle_data = readSensorData(clientID, laser_range_data, laser_angle_data)
+            laser_data = np.array([raw_angle_data, raw_range_data]).T
+            # print('Range: ', raw_range_data)
+
+            returnCode, pos = sim.simxGetObjectPosition(clientID, robotHandle, -1, 
+                sim.simx_opmode_oneshot_wait)
+            posX, posY, posZ = pos
+            print('Pos: ', pos)
+
+            # Conversão da posição do robô no ambiente para a Grid
+            posXGrid = int((posX / COEF_PROPOR) + (LARG_GRID / 2))
+            posYGrid = int(ALT_GRID - ((posY / COEF_PROPOR) + (ALT_GRID / 2)))
+            print('PosGRID: ', posXGrid, posYGrid)
+
+            returnCode, th = sim.simxGetObjectOrientation(clientID, robotHandle, -1, 
+                sim.simx_opmode_oneshot_wait)
+            ty, tz, theta = th
+            #print('Orientation: ', theta)
+
+
+            
+
+            conjAmostrasX = monteCarlo(conjAmostrasX, numParticles, ALT_GRID, LARG_GRID, raw_range_data, raw_angle_data, theta, res, 
+                LARG_GRID, ALT_GRID, posXGrid, posYGrid)
+
+            # pegar a coodenada da particula de maior peso
+
+
+            
+
+            navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel)
+
+
+
+            tempo = tempo + dt
+            i = i + 1
+            lastTime = now
+
+        # end while <reamostragem>
+'''
+
+'''     Monte Carlo     '''
+
+'''     Navegação -> base    '''
