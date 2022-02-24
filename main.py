@@ -14,26 +14,11 @@ except:
 
 
 
-
-
-
-
 # duvidas:
 
     # plotar o trajeto do monte carlo e do robo real (coppelia)
     # plotar um grafico de linha sobre a diferença da distancia do MT e a distancia real
 
-
-    # criar uma lista de robos virtuais(objetos) e aleatorizar as suas posições
-    # pegar a posição inicial e final de cada feixe de laser e o angulo, pra replicar em cada feixe dos robos virtuais
-    # aplicar Bresenham nesses pontos
-    # percorrer a lista de celulas, onde a celula estiver ocupada, é onde o feixe do laser termina (bateu)
-    # gerar um peso local baseado na distancia de cada feixe virtual e real, esquema de proporção
-    # depois fazer um peso global mediante aos pesos locais
-
-    # na reamostragem, descartar um numero n de particulas com os piores pesos
-    # adicionar na lista de particulas n/2 particulas aleatorias
-    # adicionar na lista n/2 particulas mediante as boas (esquema da roleta)
 
 
 import numpy as np
@@ -48,15 +33,17 @@ from monte_carlo import create_virtual_robot
 
 
 
-def main(numParticles: int, numReamostragens: int) -> None:
+def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
     import typing as ty
 
     '''     Inicio definição das constantes, parâmetros e do mapa<Grid>     '''
 
-    LARG_GRID: ty.Final and int = numParticles
-    ALT_GRID: ty.Final and int = numParticles
-    COEF_PROPOR: ty.Final and float = 15 / numParticles
+    LARG_GRID: ty.Final and int = map_dimension
+    ALT_GRID: ty.Final and int = map_dimension
+
+    # coeficiente de proporção
+    RESOLUCAO: ty.Final and float = 15 / map_dimension
     RANGE_MAX: ty.Final and int = 5
     RANGE_LIMIT: ty.Final and float = 0.3
     PRIORI: ty.Final and float = 0.5
@@ -156,8 +143,8 @@ def main(numParticles: int, numReamostragens: int) -> None:
             print('Pos: ', pos)
 
             # Conversão da posição do robô no ambiente para a Grid
-            posXGrid = int((posX / COEF_PROPOR) + (LARG_GRID / 2))
-            posYGrid = int(ALT_GRID - ((posY / COEF_PROPOR) + (ALT_GRID / 2)))
+            posXGrid = int((posX / RESOLUCAO) + (LARG_GRID / 2))
+            posYGrid = int(ALT_GRID - ((posY / RESOLUCAO) + (ALT_GRID / 2)))
             print('PosGRID: ', posXGrid, posYGrid)
 
             returnCode, th = sim.simxGetObjectOrientation(clientID, robotHandle, -1, 
@@ -167,9 +154,9 @@ def main(numParticles: int, numReamostragens: int) -> None:
 
 
             '''     Mapeamento -> Occupance Grid     '''
-            
+            # res
             ocuppance_grid(raw_range_data, raw_angle_data, theta, posX, posY, RANGE_MAX, RANGE_LIMIT, 
-                COEF_PROPOR, LARG_GRID, ALT_GRID, posXGrid, posYGrid, map, PRIORI)
+                RESOLUCAO, LARG_GRID, ALT_GRID, posXGrid, posYGrid, map, PRIORI)
 
 
             '''     Navegação -> base    '''
@@ -184,45 +171,33 @@ def main(numParticles: int, numReamostragens: int) -> None:
 
         # end while <geração do mapa>
 
-        
+        '''     Criação das Partículas      '''
 
-
-        # Parando o robô
-        sim.simxSetJointTargetVelocity(clientID, r_wheel, 0, sim.simx_opmode_oneshot_wait)
-        sim.simxSetJointTargetVelocity(clientID, l_wheel, 0, sim.simx_opmode_oneshot_wait)
-
-        # Parando a simulação
-        sim.simxStopSimulation(clientID, sim.simx_opmode_blocking)
-
-        # Now close the connection to CoppeliaSim:
-        sim.simxFinish(clientID)
-
-        plt.imshow(map, cmap='Greys', origin='upper', extent=(0, cols, rows, 0))
-        plt.show(10)
-
-    else:
-        print('Failed connecting to remote API server')
-
-    print('Program ended')
-
-
-main(1000, 240)
-
-
-'''
-# criar n particulas
-        for k in range(numParticles):
-            conjAmostrasX = create_virtual_robot(conjAmostrasX, raw_range_data, raw_angle_data, theta, k, res, ALT_GRID, LARG_GRID, 
-                posXGrid, posYGrid, LARG_GRID, ALT_GRID, posX, posY)
-
-        # fazer um while igual o acima, sem o mapeamento
-            # fazer a reamostragem nesse laço
-            # ordenar o vetor de particulas de forma crescente
-
-            # pegar o maior peso e adicionar em uma lista
-            # pegar a posição real do robo e colocar em outra lista
-
+        # criar n particulas
         conjAmostrasX: list[RoboVirtual] = []
+        for _ in range(numParticles):
+            conjAmostrasX = create_virtual_robot(conjAmostrasX, raw_range_data, raw_angle_data, theta, RESOLUCAO, ALT_GRID, 
+                LARG_GRID, posXGrid, posYGrid, LARG_GRID, ALT_GRID, posX, posY, map)
+
+        # soma todos os pesos particula (peso particula = media dos pesos dos feixes de laser)
+        soma_peso_particula: float = 0.0
+        for particle in conjAmostrasX:
+            soma_peso_particula = soma_peso_particula + particle.pesoParticula
+
+        # calcula o peso global
+        for particle in conjAmostrasX:
+            particle.pesoGlobal = particle.pesoParticula / soma_peso_particula
+
+            # se for a primeira particula, pesoRoleta = pesoGlobal * 100
+            # os demais pesoRoleta anterior + (pesoGlobal * 100)
+            if conjAmostrasX.index(particle) == 0:
+                particle.pesoRoleta = particle.pesoGlobal * 100
+            else:
+                particle.pesoRoleta = conjAmostrasX[conjAmostrasX.index(particle) - 1].pesoRoleta + (particle.pesoGlobal * 100)
+
+
+
+
         path_real: list[tuple[int,int]] = []
         path_monte_carlo: list[tuple[int,int]] = []
 
@@ -247,8 +222,8 @@ main(1000, 240)
             print('Pos: ', pos)
 
             # Conversão da posição do robô no ambiente para a Grid
-            posXGrid = int((posX / COEF_PROPOR) + (LARG_GRID / 2))
-            posYGrid = int(ALT_GRID - ((posY / COEF_PROPOR) + (ALT_GRID / 2)))
+            posXGrid = int((posX / RESOLUCAO) + (LARG_GRID / 2))
+            posYGrid = int(ALT_GRID - ((posY / RESOLUCAO) + (ALT_GRID / 2)))
             print('PosGRID: ', posXGrid, posYGrid)
 
             returnCode, th = sim.simxGetObjectOrientation(clientID, robotHandle, -1, 
@@ -257,15 +232,20 @@ main(1000, 240)
             #print('Orientation: ', theta)
 
 
-            
+            '''     Monte Carlo     '''
 
-            conjAmostrasX = monteCarlo(conjAmostrasX, numParticles, ALT_GRID, LARG_GRID, raw_range_data, raw_angle_data, theta, res, 
-                LARG_GRID, ALT_GRID, posXGrid, posYGrid)
+            conjAmostrasX = monteCarlo(conjAmostrasX, numParticles, ALT_GRID, LARG_GRID, raw_range_data, raw_angle_data, theta, 
+                LARG_GRID, ALT_GRID, posXGrid, RESOLUCAO, posYGrid, posX, posY, map)
 
             # pegar a coodenada da particula de maior peso
+            conjAmostrasX.sort(key = lambda x: x.pesoGlobal)
+            path_monte_carlo.append([conjAmostrasX[len(conjAmostrasX-1)].posX,conjAmostrasX[len(conjAmostrasX-1)].posY])
+
+            # pegar a coordenada real do simulador
+            path_real.append([posXGrid,posYGrid])
 
 
-            
+            '''     Navegação -> base    '''
 
             navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel)
 
@@ -276,8 +256,37 @@ main(1000, 240)
             lastTime = now
 
         # end while <reamostragem>
+
+
+        # Parando o robô
+        sim.simxSetJointTargetVelocity(clientID, r_wheel, 0, sim.simx_opmode_oneshot_wait)
+        sim.simxSetJointTargetVelocity(clientID, l_wheel, 0, sim.simx_opmode_oneshot_wait)
+
+        # Parando a simulação
+        sim.simxStopSimulation(clientID, sim.simx_opmode_blocking)
+
+        # Now close the connection to CoppeliaSim:
+        sim.simxFinish(clientID)
+
+        # desenhar os path's no mapa do occupance grid
+        print("<" + str(path_monte_carlo) + ">")
+        print("[" + str(path_real) + ">")
+
+        plt.imshow(map, cmap='Greys', origin='upper', extent=(0, cols, rows, 0))
+        plt.show(10)
+
+    else:
+        print('Failed connecting to remote API server')
+
+    print('Program ended')
+
+
+main(100, 100, 10)
+
+
 '''
 
-'''     Monte Carlo     '''
+'''
 
-'''     Navegação -> base    '''
+
+

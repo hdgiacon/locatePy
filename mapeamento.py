@@ -3,7 +3,7 @@ from auxiliares import get_line, convertion_points
 
 
 def ocuppance_grid(raw_range_data: list, raw_angle_data: list, theta: int, posX: int, posY: int, RANGE_MAX: int, RANGE_LIMIT: int, 
-    RES: float, LARG_GRID: int, ALT_GRID: int, posXGrid: int, posYGrid: int, m: np.float, PRIORI: float) -> None:
+    RESOLUCAO: float, LARG_GRID: int, ALT_GRID: int, posXGrid: int, posYGrid: int, m: np.float, PRIORI: float) -> None:
     ''' comentario sobre a função '''
 
     for i in range(len(raw_range_data)):
@@ -13,14 +13,11 @@ def ocuppance_grid(raw_range_data: list, raw_angle_data: list, theta: int, posX:
         else:
             taxaOC = 0.48
 
-        # <codigo retirado>
-
-        point1, point2 = convertion_points(raw_range_data, raw_angle_data, theta, posX, posY, i, RES, ALT_GRID, LARG_GRID, 
+        point1, point2 = convertion_points(raw_range_data, raw_angle_data, theta, posX, posY, i, RESOLUCAO, ALT_GRID, LARG_GRID, 
         posXGrid, posYGrid)
 
         cells = get_line(point1, point2)
-        #print("Celulas")
-        #print(cells)
+
         for j in range(len(cells)):
             linha, coluna = cells[j]
             linha = int(linha)

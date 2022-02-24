@@ -106,7 +106,7 @@ def get_line(start: int, end: int) -> 'list[tuple[int, int]]':
 
     return points
 
-def convertion_points(raw_range_data: list, raw_angle_data: list, theta: float, posX: int, posY: int, k: int, RES: float, 
+def convertion_points(raw_range_data: list, raw_angle_data: list, theta: float, posX: int, posY: int, k: int, RESOLUCAO: float, 
     ALT_GRID: int, LARG_GRID: int, posXGrid: int, posYGrid: int) -> int and int:
     ''' comentario sobre a função '''
     
@@ -114,9 +114,9 @@ def convertion_points(raw_range_data: list, raw_angle_data: list, theta: float, 
     yL = math.sin(raw_angle_data[k] + theta) * raw_range_data[k] + posY
 
 
-    # Conversão da posição de onde o laser bateu no ambiente para a Grid
-    xLGrid = int((xL / RES) + (LARG_GRID / 2))
-    yLGrid = int(ALT_GRID - ((yL / RES) + (ALT_GRID / 2)))
+    # Conversão da posição de onde o laser bateu no ambiente para a Grids
+    xLGrid = int((xL / RESOLUCAO) + (LARG_GRID / 2))
+    yLGrid = int(ALT_GRID - ((yL / RESOLUCAO) + (ALT_GRID / 2)))
 
     if xLGrid < 0:
         xLGrid = 0
