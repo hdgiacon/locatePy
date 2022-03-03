@@ -239,7 +239,8 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
             # pegar a coodenada da particula de maior peso
             conjAmostrasX.sort(key = lambda x: x.pesoGlobal)
-            path_monte_carlo.append([conjAmostrasX[len(conjAmostrasX-1)].posX,conjAmostrasX[len(conjAmostrasX-1)].posY])
+            #TODO: ta dando erro nesse append
+            path_monte_carlo.append([conjAmostrasX[len(conjAmostrasX)-1].posX,conjAmostrasX[len(conjAmostrasX)-1].posY])
 
             # pegar a coordenada real do simulador
             path_real.append([posXGrid,posYGrid])
@@ -269,8 +270,8 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
         sim.simxFinish(clientID)
 
         # desenhar os path's no mapa do occupance grid
-        print("<" + str(path_monte_carlo) + ">")
-        print("[" + str(path_real) + ">")
+        print("\n Path monte Carlo: " + str(path_monte_carlo) + "\n")
+        print("\n Path real: " + str(path_real) + "\n")
 
         plt.imshow(map, cmap='Greys', origin='upper', extent=(0, cols, rows, 0))
         plt.show(10)
@@ -281,12 +282,8 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
     print('Program ended')
 
 
-main(100, 100, 10)
+# main(dimensão, particulas, numReamostragens/tempo)
 
+#main(100, 96, 10)
 
-'''
-
-'''
-
-
-
+main(1000, 96, 120)

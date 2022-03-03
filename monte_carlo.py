@@ -10,7 +10,7 @@ class RoboVirtual:
     def __init__(self, _posX: int, _posY: int, _pesoParticula: float, _pesoGlobal: float, _pesoRoleta: int) -> None:
         self.posX = _posX
         self.posY = _posY
-        self.pesoParticula = _pesoParticula,
+        self.pesoParticula = _pesoParticula,    #local
         self.pesoGlobal = _pesoGlobal,
         self.pesoRoleta = _pesoRoleta
 
@@ -41,15 +41,14 @@ def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', raw_range_data: lis
         path_r = get_line(point1_r, point2_r)
         
         # bresenham para um feixe de laser do robo virtual
-        point1_v, point2_v = convertion_points(raw_range_data, raw_angle_data, theta, conjAmostrasX[k].posX, 
-        conjAmostrasX[k].posY, k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
+        point1_v, point2_v = convertion_points(raw_range_data, raw_angle_data, theta, conjAmostrasX[len(conjAmostrasX)-1].posX, 
+        conjAmostrasX[len(conjAmostrasX)-1].posY, k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
 
         path_v = get_line(point1_v, point2_v)
 
         contPesoLocal: int = 0
         for m in path_v:
             contPesoLocal += 1
-            #TODO: ta certo acessar a grid assim? é numpy
             if grid[m[0]][m[1]] >= 0.8:
                 break
 
@@ -62,7 +61,7 @@ def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', raw_range_data: lis
             pesosLocais.append(1.0 - (abs(contPesoLocal - len(path_r)) / 10))
 
     # calcular o peso particula - media (quanto mais proximo de 0 mais proximo o robo virtual está de um robo real)
-    conjAmostrasX[k].pesoParticula = sum(pesosLocais) / len(pesosLocais)
+    conjAmostrasX[len(conjAmostrasX)-1].pesoParticula = sum(pesosLocais) / len(pesosLocais)
 
     pesosLocais.clear
 
@@ -103,7 +102,9 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
 
         # remove os elementos de menor peso -> quanto menor, mais diferente é do feixe original
         for _ in range(int(num_particles / 4)):
-            conjAmostrasX.pop(min(range(len(conjAmostrasX)), key = attrgetter('pesoParticula')))
+            #conjAmostrasX.pop(min(range(len(conjAmostrasX)), key = attrgetter('pesoParticula')))
+            #TODO: arrumar essa parte
+            conjAmostrasX.pop(conjAmostrasX.index(min(conjAmostrasX, key=lambda x: x.pesoParticula)))
 
         # adicionar na lista n/8 particulas mediante as boas (esquema da roleta)
         for _ in range(int(num_particles / 8)):
