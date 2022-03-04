@@ -171,7 +171,11 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
         # end while <geração do mapa>
 
+        print("\n Fim do mapeamento, inicio da localização \n")
+
         '''     Criação das Partículas      '''
+
+        #TODO: acho que o tempo gasto esta aqui, o robo continua a andar enquanto as particulas são geradas
 
         # criar n particulas
         conjAmostrasX: list[RoboVirtual] = []
@@ -201,7 +205,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
         path_real: list[tuple[int,int]] = []
         path_monte_carlo: list[tuple[int,int]] = []
 
-        tempo: int = 0
+        tempo = 0
         # Lembrar de habilitar o 'Real-time mode'
         startTime = time.time()
         lastTime = startTime
@@ -239,7 +243,6 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
             # pegar a coodenada da particula de maior peso
             conjAmostrasX.sort(key = lambda x: x.pesoGlobal)
-            #TODO: ta dando erro nesse append
             path_monte_carlo.append([conjAmostrasX[len(conjAmostrasX)-1].posX,conjAmostrasX[len(conjAmostrasX)-1].posY])
 
             # pegar a coordenada real do simulador
@@ -275,6 +278,8 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
         plt.imshow(map, cmap='Greys', origin='upper', extent=(0, cols, rows, 0))
         plt.show(10)
+
+        #TODO: fazer plots pra verificar qual a probabilidade de estar ocupado
 
     else:
         print('Failed connecting to remote API server')
