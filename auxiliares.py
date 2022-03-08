@@ -170,11 +170,11 @@ def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', raw_range_data: lis
     #TODO: verificar se a particula instanciada esta em uma parede/obstaculo ou mapa obscuro
 
     while True:
-        auxX = randint(0, larg_grid)
-        auxY = randint(0, alt_grid)
+        auxX = randint(0, larg_grid - 1)
+        auxY = randint(0, alt_grid - 1)
 
         # espaço conhecido e não é um obstáculo
-        if not grid[auxX][auxY] == 0.5 and not grid[auxX][auxY] >= 0.8:
+        if not grid[auxX][auxY] == 0.5:
             conjAmostrasX.append(
                 RoboVirtual(
                     auxX, 
@@ -204,7 +204,7 @@ def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', raw_range_data: lis
         contPesoLocal: int = 0
         for m in path_v:
             contPesoLocal += 1
-            if grid[m[0]][m[1]] >= 0.8:
+            if grid[m[0]][m[1]] >= 0.999:
                 break
 
         if contPesoLocal == len(path_r):
