@@ -180,26 +180,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
         # criar n particulas
         conjAmostrasX: list[RoboVirtual] = []
         for _ in range(numParticles):
-            conjAmostrasX = create_virtual_robot(conjAmostrasX, raw_range_data, raw_angle_data, theta, RESOLUCAO, ALT_GRID, 
-                LARG_GRID, posXGrid, posYGrid, LARG_GRID, ALT_GRID, posX, posY, map)
-
-        # soma todos os pesos particula (peso particula = media dos pesos dos feixes de laser)
-        soma_peso_particula: float = 0.0
-        for particle in conjAmostrasX:
-            soma_peso_particula = soma_peso_particula + particle.pesoParticula
-
-        # calcula o peso global
-        for particle in conjAmostrasX:
-            particle.pesoGlobal = particle.pesoParticula / soma_peso_particula
-
-            # se for a primeira particula, pesoRoleta = pesoGlobal * 100
-            # os demais pesoRoleta anterior + (pesoGlobal * 100)
-            if conjAmostrasX.index(particle) == 0:
-                particle.pesoRoleta = particle.pesoGlobal * 100
-            else:
-                particle.pesoRoleta = conjAmostrasX[conjAmostrasX.index(particle) - 1].pesoRoleta + (particle.pesoGlobal * 100)
-
-
+            conjAmostrasX = create_virtual_robot(conjAmostrasX, ALT_GRID, LARG_GRID, map)
 
 
         path_real: list[tuple[int,int]] = []
@@ -252,6 +233,22 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
             '''     Navegação -> base    '''
 
             navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel)
+
+            #TODO: movimentação das particulas
+
+            # ponto na grid de onde o feixe da particula bateu (fazer isso para todos os feixes)
+
+            # converter o ponto xLGrid e yLGrid para xL e yL (pontos no mapa do coppelia)
+
+            # com xL e yL da pra saber o tamanho do feixe do robo virtual desde que a posição da particula virtual é conhecida
+
+            # inserir o tamanho do feixe encontrado no range_data desta particula
+
+            # construir o laser data a partir do range_data e do angle_data de cada particula (angle_data não muda)
+
+            # aplicar a navegação_base (versão mais simples do que a do robo real) em cada particula
+
+            # atualizar a posição da particula apos a movimentação
 
 
 

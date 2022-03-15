@@ -153,17 +153,13 @@ class RoboVirtual:
     def __init__(self, _posX: int, _posY: int, _pesoParticula: float, _pesoGlobal: float, _pesoRoleta: int) -> None:
         self.posX = _posX
         self.posY = _posY
-        self.pesoParticula = _pesoParticula,    #local
-        self.pesoGlobal = _pesoGlobal,
-        self.pesoRoleta = _pesoRoleta
+        self.pesoParticula = _pesoParticula,    # peso local -> media dos pesos dos feixes
+        self.pesoGlobal = _pesoGlobal,          # peso global -> peso em relação à todas as partículas
+        self.pesoRoleta = _pesoRoleta           # peso roleta -> peso acumulado em relação à todas as partículas
 
 
-def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', raw_range_data: list, raw_angle_data: list, theta: int, 
-    COEF_PROP: float, ALT_GRID: int, LARG_GRID: int, posXGrid: int, posYGrid: int, larg_grid:int , alt_grid: int, 
-    posX: int, posY: int, grid: np.array) -> 'list[RoboVirtual]':
+def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', larg_grid:int , alt_grid: int, grid: np.array) -> 'list[RoboVirtual]':
     ''' comentario sobre a função '''
-    
-    pesosLocais: list[float] = []
 
     #TODO: mudar o cenario, fazer menor, 16x16 ou 14x14
 
@@ -185,39 +181,5 @@ def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', raw_range_data: lis
                 )
             )
             break
-    
-
-    # fazer isso pro numero de feixes de lasers
-    for k in range(len(raw_range_data)):
-        # bresenham para um feixe de laser do robo real
-        point1_r, point2_r = convertion_points(raw_range_data, raw_angle_data, theta, posX, 
-        posY, k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
-
-        path_r = get_line(point1_r, point2_r)
-        
-        # bresenham para um feixe de laser do robo virtual
-        point1_v, point2_v = convertion_points(raw_range_data, raw_angle_data, theta, conjAmostrasX[len(conjAmostrasX)-1].posX, 
-        conjAmostrasX[len(conjAmostrasX)-1].posY, k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
-
-        path_v = get_line(point1_v, point2_v)
-
-        contPesoLocal: int = 0
-        for m in path_v:
-            contPesoLocal += 1
-            if grid[m[0]][m[1]] >= 0.999:
-                break
-
-        if contPesoLocal == len(path_r):
-            # atribuir peso caso forem iguais
-            pesosLocais.append(1.0)
-            
-        else:
-            # calculo do peso local caso não sejam iguais
-            pesosLocais.append(1.0 - (abs(contPesoLocal - len(path_r)) / 10))
-
-    # calcular o peso particula - media (quanto mais proximo de 0 mais proximo o robo virtual está de um robo real)
-    conjAmostrasX[len(conjAmostrasX)-1].pesoParticula = sum(pesosLocais) / len(pesosLocais)
-
-    pesosLocais.clear
 
     return conjAmostrasX
