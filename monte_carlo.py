@@ -50,6 +50,9 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
                     if grid[m[0]][m[1]] >= 0.999:
                         break
 
+                # armazena o local onde o feixe de laser bateu (usar o range data da particula mesmo)
+                t.range_data.append(path_v[contPesoLocal])
+
                 if contPesoLocal == len(path_r):
                     # atribuir peso caso forem iguais
                     pesosLocais.append(1.0)
@@ -127,6 +130,9 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
                     contPesoLocal += 1
                     if grid[m[0]][m[1]] >= 0.999:
                         break
+
+                # armazena o local onde o feixe de laser bateu (usar o range data da particula mesmo)
+                conjAmostrasX[len(conjAmostrasX)-1].range_data.append(path_v[contPesoLocal])
 
                 if contPesoLocal == len(path_r):
                     # atribuir peso caso forem iguais

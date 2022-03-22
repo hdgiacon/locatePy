@@ -21,6 +21,7 @@ except:
 
 
 
+from math import sin
 import numpy as np
 import matplotlib.pyplot as plt
 import time
@@ -219,8 +220,8 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
             '''     Monte Carlo     '''
 
-            conjAmostrasX = monteCarlo(conjAmostrasX, numParticles, ALT_GRID, LARG_GRID, raw_range_data, raw_angle_data, theta, 
-                LARG_GRID, ALT_GRID, posXGrid, RESOLUCAO, posYGrid, posX, posY, map)
+            conjAmostrasX = monteCarlo(conjAmostrasX, numParticles, ALT_GRID, LARG_GRID, raw_range_data, 
+                raw_angle_data, theta, LARG_GRID, ALT_GRID, posXGrid, RESOLUCAO, posYGrid, posX, posY, map)
 
             # pegar a coodenada da particula de maior peso
             conjAmostrasX.sort(key = lambda x: x.pesoGlobal)
@@ -236,20 +237,99 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
             #TODO: movimentação das particulas
 
-            # ponto na grid de onde o feixe da particula bateu (fazer isso para todos os feixes)
+            # ponto na grid de onde o feixe da particula bateu (fazer isso para todos os feixes)        feito
 
-            # converter o ponto xLGrid e yLGrid para xL e yL (pontos no mapa do coppelia)
+            # converter o ponto xLGrid e yLGrid para xL e yL (pontos no mapa do coppelia)               feito
 
             # com xL e yL da pra saber o tamanho do feixe do robo virtual desde que a posição da particula virtual é conhecida
+            #TODO: ta faltando fazer essa parte (e a abaixo tb), como eu faço? arrumar a insersão no range_data das particulas
 
             # inserir o tamanho do feixe encontrado no range_data desta particula
 
-            # construir o laser data a partir do range_data e do angle_data de cada particula (angle_data não muda)
+            aux_range_data: list[int] = []
+            index_angle: int = 0
+
+            for particle in conjAmostrasX:
+                for data in particle.range_data:
+
+                    # pro alpha (valor que vem do angle data) criar um contador e incrementar dentro desse for interno
+                    alpha = raw_angle_data[index_angle]
+
+                    xL = int((RESOLUCAO * (2 * data[0] - LARG_GRID)) / 2)
+                    yL = int((RESOLUCAO * (2 * data[1] - ALT_GRID)) / 2)
+
+                    # converter a posição da particula para mapa coppelia tb
+
+                    posXParticle = int((RESOLUCAO * (2 * particle.posX - LARG_GRID)) / 2)
+                    posYParticle = int((RESOLUCAO * (2 * particle.posy - LARG_GRID)) / 2)
+
+                    cat_opos = abs(yL - posYParticle)
+
+                    # if externo -> verifica o quadrante do feixe de laser
+                        # if interno -> verifica a direção em que o robo aponta
+
+                    if xL > posXParticle and yL > posYParticle:     # primeiro quadrante 
+                        if theta < 90:
+                            beta = alpha + theta
+                            pass
+                        elif theta < 180:
+                            beta = theta - alpha
+                            pass
+                        elif theta >= 270:
+                            beta = alpha - (360 - theta)
+                            pass
+                    elif xL < posXParticle and yL > posYParticle:   # segundo quadrante
+                        if theta < 90:
+                            beta = 180 - (alpha + theta)
+                            pass
+                        elif theta < 180:
+                            beta = 180 - theta
+                            pass
+                        elif theta < 270:
+                            beta = alpha - (theta - 180)
+                            pass
+                    elif xL < posXParticle and yL < posYParticle:   # terceiro quadrante
+                        if theta < 180 and theta > 90:
+                            beta = alpha - (180 - theta)
+                            pass
+                        elif theta < 270:
+                            beta = theta - 180 + alpha
+                            pass
+                        elif theta < 360:
+                            beta = 180 - 360 - theta       #TODO ta certo essa parte?
+                            pass
+                    else:                                           # quarto quadrante
+                        if theta < 90:
+                            beta = alpha - theta
+                            pass
+                        elif theta < 180:
+                            beta = 360 - theta - alpha
+                            pass
+                        elif theta < 360:
+                            beta = 360 - theta + alpha
+                            pass
+
+                    index_angle += 1
+
+
+                    #hipotenusa = sen(beta) * CO
+                    tam_feixe = sin(beta) * cat_opos
+
+                    aux_range_data.append(tam_feixe)
+
+                # todos os valores de tam_feixe dos estão no atributo da particula
+                particle.range_data = aux_range_data
+
+                # construir o laser data a partir do range_data e do angle_data de cada particula (angle_data não muda)
+
+                #TODO: esse range data que eu tenho aqui corresponde ao raw_range_data?
+                #TODO: ta certo essa parte?
+                particle.laser_data = np.array([particle.range_data, raw_angle_data]).T
+            
 
             # aplicar a navegação_base (versão mais simples do que a do robo real) em cada particula
 
             # atualizar a posição da particula apos a movimentação
-
 
 
             tempo = tempo + dt
@@ -275,8 +355,6 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
         plt.imshow(map, cmap='Greys', origin='upper', extent=(0, cols, rows, 0))
         plt.show(10)
-
-        #TODO: fazer plots pra verificar qual a probabilidade de estar ocupado
 
     else:
         print('Failed connecting to remote API server')

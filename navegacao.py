@@ -12,6 +12,8 @@ except:
 
 import numpy as np
 
+from auxiliares import RoboVirtual
+
 def navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel) -> None:
     ''' comentario sobre a função '''
 
@@ -46,3 +48,51 @@ def navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel) -> None:
     # Enviando velocidades
     sim.simxSetJointTargetVelocity(clientID, l_wheel, wl, sim.simx_opmode_streaming + 5)
     sim.simxSetJointTargetVelocity(clientID, r_wheel, wr, sim.simx_opmode_streaming + 5)
+
+
+def navegacao_particula_base(particula: RoboVirtual, theta: int):
+
+    laser_data = particula.laser_data
+
+    frente = int(len(laser_data) / 2)
+    lado_direito = int(len(laser_data) * 1 / 4)
+    lado_esquerdo = int(len(laser_data) * 3 / 4)
+
+    if laser_data[frente, 1] < 1:
+        if theta <= 90:
+            pass
+        elif theta <= 180:
+            pass
+        elif theta <= 270:
+            pass
+        elif theta <= 360:
+            pass
+
+        # verificar se esta no 1º quadrante
+        # verificar se esta no 2º quadrante
+        # verificar se esta no 3º quadrante
+        # verificar se esta no 4º quadrante
+    elif laser_data[lado_direito, 1] < 1:
+        # verificar se esta no 1º quadrante
+        # verificar se esta no 2º quadrante
+        # verificar se esta no 3º quadrante
+        # verificar se esta no 4º quadrante
+
+        #particula.posX -= 2
+        #particula.posY += 2
+        pass
+    elif laser_data[lado_esquerdo, 1] < 1:
+        # verificar se esta no 1º quadrante
+        # verificar se esta no 2º quadrante
+        # verificar se esta no 3º quadrante
+        # verificar se esta no 4º quadrante
+
+        #particula.posX += 2
+        #particula.posY += 2
+        pass
+    else:
+        pass
+
+    #TODO: como fazer a movimentação da particula? atualizar a sua posição no mapa, precisa converter pra grid? a posição da 
+        # particula esta dada em termos da grid e nao do mapa do coppelia
+        # seria aumentar ou decrementar os valores de X e Y?

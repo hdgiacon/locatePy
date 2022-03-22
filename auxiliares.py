@@ -150,20 +150,19 @@ def convertion_points(raw_range_data: list, raw_angle_data: list, theta: float, 
 
 class RoboVirtual:
     ''' comentario sobre a classe '''
-    def __init__(self, _posX: int, _posY: int, _pesoParticula: float, _pesoGlobal: float, _pesoRoleta: int) -> None:
+    def __init__(self, _posX: int, _posY: int, _pesoParticula: float, _pesoGlobal: float, 
+        _pesoRoleta: int) -> None:
         self.posX = _posX
         self.posY = _posY
         self.pesoParticula = _pesoParticula,    # peso local -> media dos pesos dos feixes
         self.pesoGlobal = _pesoGlobal,          # peso global -> peso em relação à todas as partículas
-        self.pesoRoleta = _pesoRoleta           # peso roleta -> peso acumulado em relação à todas as partículas
+        self.pesoRoleta = _pesoRoleta,          # peso roleta -> peso acumulado em relação à todas as partículas
+        self.range_data,                        # para modelo de observação e movimentação da particula
+        self.laser_data                         # tupla de range_data da particula com angle data
 
 
 def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', larg_grid:int , alt_grid: int, grid: np.array) -> 'list[RoboVirtual]':
     ''' comentario sobre a função '''
-
-    #TODO: mudar o cenario, fazer menor, 16x16 ou 14x14
-
-    #TODO: verificar se a particula instanciada esta em uma parede/obstaculo ou mapa obscuro
 
     while True:
         auxX = randint(0, larg_grid - 1)
