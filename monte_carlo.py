@@ -28,7 +28,7 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
         # peso local
         pesosLocais: list[float] = []
 
-        for t in conjAmostrasX:
+        for particle in conjAmostrasX:
 
             # fazer isso pro numero de feixes de lasers
             for k in range(len(raw_range_data)):
@@ -39,8 +39,8 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
                 path_r = get_line(point1_r, point2_r)
                 
                 # bresenham para um feixe de laser do robo virtual
-                point1_v, point2_v = convertion_points(raw_range_data, raw_angle_data, theta, conjAmostrasX[len(conjAmostrasX)-1].posX, 
-                conjAmostrasX[len(conjAmostrasX)-1].posY, k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
+                point1_v, point2_v = convertion_points(raw_range_data, raw_angle_data, particle.theta, particle.posX, particle.posY,
+                k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
 
                 path_v = get_line(point1_v, point2_v)
 
@@ -51,7 +51,7 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
                         break
 
                 # armazena o local onde o feixe de laser bateu (usar o range data da particula mesmo)
-                t.range_data.append(path_v[contPesoLocal])
+                particle.range_data.append(path_v[contPesoLocal])
 
                 if contPesoLocal == len(path_r):
                     # atribuir peso caso forem iguais
@@ -63,7 +63,7 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
 
             # calcular o peso particula - media (quanto mais proximo de 0 mais proximo o robo virtual está de um robo real)
             #conjAmostrasX[len(conjAmostrasX)-1].pesoParticula = sum(pesosLocais) / len(pesosLocais)
-            t.pesoParticula = sum(pesosLocais) / len(pesosLocais)
+            particle.pesoParticula = sum(pesosLocais) / len(pesosLocais)
             #TODO: os pesos particulas estão dando valores negativos
             pesosLocais.clear
 
@@ -120,8 +120,9 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
                 path_r = get_line(point1_r, point2_r)
                 
                 # bresenham para um feixe de laser do robo virtual
-                point1_v, point2_v = convertion_points(raw_range_data, raw_angle_data, theta, conjAmostrasX[len(conjAmostrasX)-1].posX, 
-                conjAmostrasX[len(conjAmostrasX)-1].posY, k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
+                point1_v, point2_v = convertion_points(raw_range_data, raw_angle_data, conjAmostrasX[len(conjAmostrasX)-1].theta, 
+                conjAmostrasX[len(conjAmostrasX)-1].posX, conjAmostrasX[len(conjAmostrasX)-1].posY, k, COEF_PROP, ALT_GRID, 
+                LARG_GRID, posXGrid, posYGrid)
 
                 path_v = get_line(point1_v, point2_v)
 

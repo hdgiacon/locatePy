@@ -28,7 +28,7 @@ import time
 
 from mapeamento import ocuppance_grid
 from monte_carlo import RoboVirtual, monteCarlo
-from navegacao import navegacao_base
+from navegacao import navegacao_base, navegacao_particula_base
 from auxiliares import readSensorData
 from monte_carlo import create_virtual_robot
 
@@ -235,16 +235,14 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
             navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel)
 
-            #TODO: movimentação das particulas
 
             # ponto na grid de onde o feixe da particula bateu (fazer isso para todos os feixes)        feito
 
             # converter o ponto xLGrid e yLGrid para xL e yL (pontos no mapa do coppelia)               feito
 
-            # com xL e yL da pra saber o tamanho do feixe do robo virtual desde que a posição da particula virtual é conhecida
-            #TODO: ta faltando fazer essa parte (e a abaixo tb), como eu faço? arrumar a insersão no range_data das particulas
+            # com xL e yL da pra saber o tamanho do feixe do robo virtual desde que a posição da particula virtual é conhecida      feito
 
-            # inserir o tamanho do feixe encontrado no range_data desta particula
+            # inserir o tamanho do feixe encontrado no range_data desta particula       feito
 
             aux_range_data: list[int] = []
             index_angle: int = 0
@@ -320,16 +318,18 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
                 # todos os valores de tam_feixe dos estão no atributo da particula
                 particle.range_data = aux_range_data
 
-                # construir o laser data a partir do range_data e do angle_data de cada particula (angle_data não muda)
+                # construir o laser data a partir do range_data e do angle_data de cada particula (angle_data não muda)         feito
 
                 #TODO: esse range data que eu tenho aqui corresponde ao raw_range_data?
                 #TODO: ta certo essa parte?
                 particle.laser_data = np.array([particle.range_data, raw_angle_data]).T
             
 
-            # aplicar a navegação_base (versão mais simples do que a do robo real) em cada particula
+                # aplicar a navegação_base (versão mais simples do que a do robo real) em cada particula
 
-            # atualizar a posição da particula apos a movimentação
+                # atualizar a posição da particula apos a movimentação
+
+                navegacao_particula_base(particle)
 
 
             tempo = tempo + dt

@@ -150,10 +150,11 @@ def convertion_points(raw_range_data: list, raw_angle_data: list, theta: float, 
 
 class RoboVirtual:
     ''' comentario sobre a classe '''
-    def __init__(self, _posX: int, _posY: int, _pesoParticula: float, _pesoGlobal: float, 
+    def __init__(self, _posX: int, _posY: int, _theta: int, _pesoParticula: float, _pesoGlobal: float, 
         _pesoRoleta: int) -> None:
-        self.posX = _posX
-        self.posY = _posY
+        self.posX = _posX,
+        self.posY = _posY,
+        self.theta = _theta,
         self.pesoParticula = _pesoParticula,    # peso local -> media dos pesos dos feixes
         self.pesoGlobal = _pesoGlobal,          # peso global -> peso em relação à todas as partículas
         self.pesoRoleta = _pesoRoleta,          # peso roleta -> peso acumulado em relação à todas as partículas
@@ -163,6 +164,8 @@ class RoboVirtual:
 
 def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', larg_grid:int , alt_grid: int, grid: np.array) -> 'list[RoboVirtual]':
     ''' comentario sobre a função '''
+
+    aux_theta = randint(0, 360 - 1)
 
     while True:
         auxX = randint(0, larg_grid - 1)
@@ -174,6 +177,7 @@ def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', larg_grid:int , alt
                 RoboVirtual(
                     auxX, 
                     auxY,
+                    aux_theta,
                     0.0,
                     0.0,
                     0
