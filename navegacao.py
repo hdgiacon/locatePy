@@ -58,7 +58,9 @@ def navegacao_particula_base(particula: RoboVirtual):   # theta da particula
     lado_direito = int(len(laser_data) * 1 / 4)
     lado_esquerdo = int(len(laser_data) * 3 / 4)
 
-    if laser_data[frente, 1] < 1:                           #TODO: ta certo tudo isso?
+    # se estiver a frente ou a direita, virar para a esquerda
+
+    if laser_data[frente, 1] < 1:       #TODO ta dando erro aqui
         if particula.theta <= 90:     # 1º quadrante
             particula.posX -= 2
             particula.posY += 2
@@ -78,10 +80,10 @@ def navegacao_particula_base(particula: RoboVirtual):   # theta da particula
     elif laser_data[lado_direito, 1] < 1:
         if particula.theta <= 90:
             particula.posX -= 2
-            particula.posY -= 2
+            particula.posY += 2
 
         elif particula.theta <= 180:
-            particula.posX -= 2
+            particula.posX += 2
             particula.posY += 2
 
         elif particula.theta <= 270:
@@ -89,24 +91,24 @@ def navegacao_particula_base(particula: RoboVirtual):   # theta da particula
             particula.posY -= 2
 
         elif particula.theta <= 360:
-            particula.posX += 2
-            particula.posY += 2
+            particula.posX -= 2
+            particula.posY -= 2
 
     elif laser_data[lado_esquerdo, 1] < 1:
         if particula.theta <= 90:
             particula.posX += 2
-            particula.posY += 2
+            particula.posY -= 2
 
         elif particula.theta <= 180:
-            particula.posX += 2
+            particula.posX -= 2
             particula.posY -= 2
 
         elif particula.theta <= 270:
             particula.posX -= 2
-            particula.posY -= 2
+            particula.posY += 2
 
         elif particula.theta <= 360:
-            particula.posX -= 2
+            particula.posX += 2
             particula.posY += 2
 
     else:                               #TODO: seria andar sem estar perto de uma parede?

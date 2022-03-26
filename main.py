@@ -25,6 +25,7 @@ from math import sin
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+import copy
 
 from mapeamento import ocuppance_grid
 from monte_carlo import RoboVirtual, monteCarlo
@@ -248,6 +249,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
             index_angle: int = 0
 
             for particle in conjAmostrasX:
+                index_angle = 0
                 for data in particle.range_data:
 
                     # pro alpha (valor que vem do angle data) criar um contador e incrementar dentro desse for interno
@@ -259,7 +261,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
                     # converter a posição da particula para mapa coppelia tb
 
                     posXParticle = int((RESOLUCAO * (2 * particle.posX - LARG_GRID)) / 2)
-                    posYParticle = int((RESOLUCAO * (2 * particle.posy - LARG_GRID)) / 2)
+                    posYParticle = int((RESOLUCAO * (2 * particle.posY - LARG_GRID)) / 2)
 
                     cat_opos = abs(yL - posYParticle)
 
@@ -269,43 +271,43 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
                     if xL > posXParticle and yL > posYParticle:     # primeiro quadrante 
                         if theta < 90:
                             beta = alpha + theta
-                            pass
+                            
                         elif theta < 180:
                             beta = theta - alpha
-                            pass
+                            
                         elif theta >= 270:
                             beta = alpha - (360 - theta)
-                            pass
+                            
                     elif xL < posXParticle and yL > posYParticle:   # segundo quadrante
                         if theta < 90:
                             beta = 180 - (alpha + theta)
-                            pass
+                            
                         elif theta < 180:
                             beta = 180 - theta
-                            pass
+                            
                         elif theta < 270:
                             beta = alpha - (theta - 180)
-                            pass
+                            
                     elif xL < posXParticle and yL < posYParticle:   # terceiro quadrante
                         if theta < 180 and theta > 90:
                             beta = alpha - (180 - theta)
-                            pass
+                            
                         elif theta < 270:
                             beta = theta - 180 + alpha
-                            pass
+                            
                         elif theta < 360:
-                            beta = 180 - 360 - theta       #TODO ta certo essa parte?
-                            pass
+                            beta = 180 - 360 - theta
+                            
                     else:                                           # quarto quadrante
                         if theta < 90:
                             beta = alpha - theta
-                            pass
+                            
                         elif theta < 180:
                             beta = 360 - theta - alpha
-                            pass
+                            
                         elif theta < 360:
                             beta = 360 - theta + alpha
-                            pass
+                            
 
                     index_angle += 1
 
@@ -316,18 +318,18 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
                     aux_range_data.append(tam_feixe)
 
                 # todos os valores de tam_feixe dos estão no atributo da particula
-                particle.range_data = aux_range_data
+                particle.range_data = copy.deepcopy(aux_range_data) 
 
                 # construir o laser data a partir do range_data e do angle_data de cada particula (angle_data não muda)         feito
 
-                #TODO: esse range data que eu tenho aqui corresponde ao raw_range_data?
-                #TODO: ta certo essa parte?
                 particle.laser_data = np.array([particle.range_data, raw_angle_data]).T
+                #TODO: ta dando um erro aqui a partir da segunda iteração
             
+                aux_range_data.clear()
 
-                # aplicar a navegação_base (versão mais simples do que a do robo real) em cada particula
+                # aplicar a navegação_base (versão mais simples do que a do robo real) em cada particula    feito
 
-                # atualizar a posição da particula apos a movimentação
+                # atualizar a posição da particula apos a movimentação      feito
 
                 navegacao_particula_base(particle)
 
