@@ -8,12 +8,12 @@ def ocuppance_grid(raw_range_data: list, raw_angle_data: list, theta: int, posX:
 
     for i in range(len(raw_range_data)):
         # inverse sensor model
-        if raw_range_data[i] < RANGE_MAX * RANGE_LIMIT:
-            taxaOC = 0.9
-        else:
-            taxaOC = 0.48
+        #if raw_range_data[i] < RANGE_MAX * RANGE_LIMIT:
+        #    taxaOC = 0.9
+        #else:
+        #    taxaOC = 0.48
 
-        point1, point2 = convertion_points(raw_range_data, raw_angle_data, theta, posX, posY, i, RESOLUCAO, ALT_GRID, LARG_GRID, 
+        point1, point2, xLGrid, yLGrid = convertion_points(raw_range_data, raw_angle_data, theta, posX, posY, i, RESOLUCAO, ALT_GRID, LARG_GRID, 
         posXGrid, posYGrid)
 
         cells = get_line(point1, point2)
@@ -33,10 +33,36 @@ def ocuppance_grid(raw_range_data: list, raw_angle_data: list, theta: int, posX:
             elif coluna >= ALT_GRID:
                 coluna = ALT_GRID-1
 
-            m[linha, coluna] = 1 - pow(1 + (taxaOC/(1 - taxaOC)) * ((1 - PRIORI)/PRIORI) * (m[linha, coluna]/(1 - m[linha, coluna] \
-                + 0.00001)), -1) + 0.00001
+            #m[linha, coluna] = 1 - pow(1 + (taxaOC/(1 - taxaOC)) * ((1 - PRIORI)/PRIORI) * (m[linha, coluna]/(1 - m[linha, coluna] \
+            #    + 0.00001)), -1) + 0.00001
 
-            if taxaOC > 0.5:
-                taxaOC = 0.48
-            else:
-                taxaOC = 0.95
+            m[linha, coluna] = 0.75
+
+            #if taxaOC > 0.5:
+            #    taxaOC = 0.48
+            #else:
+            #    taxaOC = 0.95
+
+        if raw_range_data[i] < RANGE_MAX * 0.95:
+            m[yLGrid, xLGrid] = 1.0
+
+            if xLGrid < 0:
+                xLGrid = 0
+            elif xLGrid > LARG_GRID:
+                xLGrid = LARG_GRID
+
+            if yLGrid < 0:
+                yLGrid = 0
+            elif yLGrid > LARG_GRID:
+                yLGrid = LARG_GRID
+
+            m[yLGrid, xLGrid - 1 if xLGrid > 0 else 0] = 1.0
+            m[yLGrid, xLGrid + 1 if xLGrid < LARG_GRID-1 else 0] = 1.0
+
+            m[yLGrid - 1 if yLGrid > 0 else 0, xLGrid] = 1.0
+            m[yLGrid - 1 if yLGrid > 0 else 0, xLGrid - 1 if xLGrid > 0 else 0] = 1.0
+            m[yLGrid - 1 if yLGrid > 0 else 0, xLGrid + 1 if xLGrid < LARG_GRID-1 else 0] = 1.0
+
+            m[yLGrid + 1 if yLGrid < LARG_GRID-1 else 0, xLGrid] = 1.0
+            m[yLGrid + 1 if yLGrid < LARG_GRID - 1 else 0, xLGrid - 1 if xLGrid > 0 else 0] = 1.0
+            m[yLGrid + 1 if yLGrid < LARG_GRID - 1 else 0, xLGrid + 1 if xLGrid < LARG_GRID-1 else 0] = 1.0

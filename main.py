@@ -45,8 +45,8 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
     ALT_GRID: ty.Final and int = map_dimension
 
     # coeficiente de proporção
-    RESOLUCAO: ty.Final and float = 15 / map_dimension
-    RANGE_MAX: ty.Final and int = 5
+    RESOLUCAO: ty.Final and float = 7.5 / (map_dimension / 2)
+    RANGE_MAX: ty.Final and float = 5
     RANGE_LIMIT: ty.Final and float = 0.3
     PRIORI: ty.Final and float = 0.5
     CELL_SIZE: ty.Final and int = 1
@@ -176,7 +176,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
         print("\n Fim do mapeamento, inicio da localização \n")
 
         '''     Criação das Partículas      '''
-
+        '''
         #TODO: acho que o tempo gasto esta aqui, o robo continua a andar enquanto as particulas são geradas
 
         # criar n particulas
@@ -219,7 +219,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
             #print('Orientation: ', theta)
 
 
-            '''     Monte Carlo     '''
+            
 
             conjAmostrasX = monteCarlo(conjAmostrasX, numParticles, ALT_GRID, LARG_GRID, raw_range_data, 
                 raw_angle_data, theta, LARG_GRID, ALT_GRID, posXGrid, RESOLUCAO, posYGrid, posX, posY, map)
@@ -231,8 +231,8 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
             # pegar a coordenada real do simulador
             path_real.append([posXGrid,posYGrid])
 
+            
 
-            '''     Navegação -> base    '''
 
             navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel)
 
@@ -339,8 +339,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
             lastTime = now
 
         # end while <reamostragem>
-
-
+        '''
         # Parando o robô
         sim.simxSetJointTargetVelocity(clientID, r_wheel, 0, sim.simx_opmode_oneshot_wait)
         sim.simxSetJointTargetVelocity(clientID, l_wheel, 0, sim.simx_opmode_oneshot_wait)
@@ -352,8 +351,8 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
         sim.simxFinish(clientID)
 
         # desenhar os path's no mapa do occupance grid
-        print("\n Path monte Carlo: " + str(path_monte_carlo) + "\n")
-        print("\n Path real: " + str(path_real) + "\n")
+        #print("\n Path monte Carlo: " + str(path_monte_carlo) + "\n")
+        #print("\n Path real: " + str(path_real) + "\n")
 
         plt.imshow(map, cmap='Greys', origin='upper', extent=(0, cols, rows, 0))
         plt.show(10)
@@ -368,4 +367,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
 #main(100, 96, 10)
 
-main(1000, 96, 120)
+main(500, 96, 240)
+
+'''     Monte Carlo     '''
+'''     Navegação -> base    '''

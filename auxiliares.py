@@ -143,7 +143,7 @@ def convertion_points(raw_range_data: list, raw_angle_data: list, theta: float, 
     point2 = (yoi, xoi)
     #cells = get_line(point1, point2)
 
-    return point1, point2
+    return point1, point2, xLGrid, yLGrid
 
 
 
@@ -172,7 +172,7 @@ def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', larg_grid:int , alt
         auxY = randint(0, alt_grid - 1)
 
         # espaço conhecido e não é um obstáculo
-        if not grid[auxX][auxY] == 0.5:
+        if not grid[auxX][auxY] == 0.75:
             conjAmostrasX.append(
                 RoboVirtual(
                     auxX, 
