@@ -109,7 +109,7 @@ def get_line(start: int, end: int) -> 'list[tuple[int, int]]':
     return points
 
 def convertion_points(raw_range_data: list, raw_angle_data: list, theta: float, posX: int, posY: int, k: int, RESOLUCAO: float, 
-    ALT_GRID: int, LARG_GRID: int, posXGrid: int, posYGrid: int) -> int and int:
+    ALT_GRID: int, LARG_GRID: int, posXGrid: int, posYGrid: int) -> int and int and int and int:
     ''' comentario sobre a função '''
     
     xL = math.cos(raw_angle_data[k] + theta) * raw_range_data[k] + posX
@@ -146,14 +146,54 @@ def convertion_points(raw_range_data: list, raw_angle_data: list, theta: float, 
     return point1, point2, xLGrid, yLGrid
 
 
+# tem o range data no maximo pras particulas
+def convertion_points_particle(raw_angle_data: list, posX: int, posY: int, theta: float, k: int, 
+    RESOLUCAO: float, ALT_GRID: int, LARG_GRID: int, posXGrid: int, posYGrid: int):
+    ''' comentario '''
+    
+    xL = math.cos(raw_angle_data[k] + theta) * 5 + posX
+    yL = math.sin(raw_angle_data[k] + theta) * 5 + posY
+
+
+    # Conversão da posição de onde o laser bateu no ambiente para a Grids
+    xLGrid = int((xL / RESOLUCAO) + (LARG_GRID / 2))
+    yLGrid = int(ALT_GRID - ((yL / RESOLUCAO) + (ALT_GRID / 2)))
+
+    if xLGrid < 0:
+        xLGrid = 0
+    elif xLGrid >= LARG_GRID:
+        xLGrid = LARG_GRID-1
+
+    if yLGrid < 0:
+        yLGrid = 0
+    elif yLGrid >= ALT_GRID:
+        yLGrid = ALT_GRID-1
+
+    # Cálculo de todas as células de acordo com o algoritmo de Bresenham
+    #line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
+
+    xi = posXGrid
+    yi = posYGrid
+    xoi = xLGrid
+    yoi = yLGrid
+    # x é coluna; y é linha
+    # rr, cc = line(yi, xi, yoi, xoi)  # r0, c0, r1, c1
+    point1 = (yi, xi)
+    point2 = (yoi, xoi)
+    #cells = get_line(point1, point2)
+
+    return point1, point2, xLGrid, yLGrid
+
 
 
 class RoboVirtual:
     ''' comentario sobre a classe '''
-    def __init__(self, _posX: int, _posY: int, _theta: float, _pesoParticula: float, _pesoGlobal: float, 
-        _pesoRoleta: int, _range_data: list, _laser_data: list) -> None:
+    def __init__(self, _posX: int, _posY: int, _posXReal: int, _posYReal: int, _theta: float, _pesoParticula: float, 
+        _pesoGlobal: float, _pesoRoleta: int, _range_data: list, _laser_data: list) -> None:
         self.posX: int = _posX
         self.posY: int = _posY
+        self.posXReal: int = _posXReal
+        self.posYReal: int = _posYReal
         self.theta: float = _theta
         self.pesoParticula: float = _pesoParticula  # peso local -> media dos pesos dos feixes
         self.pesoGlobal: float = _pesoGlobal        # peso global -> peso em relação à todas as partículas
@@ -172,11 +212,13 @@ def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', larg_grid:int , alt
         auxY = randint(0, alt_grid - 1)
 
         # espaço conhecido e não é um obstáculo
-        if not grid[auxX][auxY] == 0.75:
+        if grid[auxX][auxY] == 0.75:
             conjAmostrasX.append(
                 RoboVirtual(
                     auxX, 
                     auxY,
+                    0,
+                    0,
                     aux_theta,
                     0.0,
                     0.0,

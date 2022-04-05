@@ -50,7 +50,7 @@ def navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel) -> None:
     sim.simxSetJointTargetVelocity(clientID, r_wheel, wr, sim.simx_opmode_streaming + 5)
 
 
-def navegacao_particula_base(particula: RoboVirtual):
+def navegacao_particula_base(particula: RoboVirtual) -> None:
 
     laser_data = particula.laser_data
 

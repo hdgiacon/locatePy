@@ -3,13 +3,13 @@ import numpy as np
 
 import sys
 
-from auxiliares import RoboVirtual, create_virtual_robot, convertion_points, get_line
+from auxiliares import RoboVirtual, convertion_points_particle, create_virtual_robot, convertion_points, get_line
 
     
 
 def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid: int, larg_grid: int, raw_range_data: list, 
     raw_angle_data: list, theta: int, LARG_GRID: int, ALT_GRID: int, posXGrid: int, COEF_PROP: float, posYGrid: int,
-    posX: int, posY: int, grid: np.array) -> 'list[RoboVirtual]':
+    posX: int, posY: int, grid: np.array, RANGE_MAX: int) -> 'list[RoboVirtual]':
     ''' comentario sobre monte carlo '''
 
 
@@ -22,49 +22,54 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
             # atualização
             # 𝑚𝑒𝑎𝑠𝑢𝑟𝑒𝑚𝑒𝑛𝑡_𝑚𝑜𝑑𝑒𝑙(𝑧_𝑡 , 𝑥_𝑡 , 𝑚) // aplica o modelo de observação atribuindo peso 𝜔_𝑡
             # 𝑋_𝑡 ← 𝑋_𝑡 + ⟨𝑥_𝑡 , 𝑤_𝑡 ⟩ // o conjunto das probabilidades das amostras 𝑋_𝑡 é gerado
-        
-        #TODO: recalcular os pesos das particulas do 0 (verificar se esta tudo certo aqui)
 
         # peso local
         pesosLocais: list[float] = []
+        contPesoLocal: int = 0
 
         for particle in conjAmostrasX:
 
             # fazer isso pro numero de feixes de lasers
             for k in range(len(raw_range_data)):
                 # bresenham para um feixe de laser do robo real
-                point1_r, point2_r = convertion_points(raw_range_data, raw_angle_data, theta, posX, 
+                point1_r, point2_r, _, _ = convertion_points(raw_range_data, raw_angle_data, theta, posX, 
                 posY, k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
 
                 path_r = get_line(point1_r, point2_r)
                 
+                # converte a posição do robo de grid para coppelia
+
+                particle.posXReal = int((COEF_PROP * (2 * particle.posX - LARG_GRID)) / 2)
+                particle.posYReal = int((COEF_PROP * (2 * particle.posY - LARG_GRID)) / 2)
+
+                point1_v, point2_v, _, _ = convertion_points_particle(raw_angle_data, particle.posXReal, particle.posYReal, 
+                particle.theta, k, COEF_PROP, ALT_GRID, LARG_GRID, particle.posX, particle.posY)
+
                 # bresenham para um feixe de laser do robo virtual
-                point1_v, point2_v = convertion_points(raw_range_data, raw_angle_data, particle.theta, particle.posX, particle.posY,
-                k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
 
                 path_v = get_line(point1_v, point2_v)
 
-                contPesoLocal: int = 0
+                contPesoLocal = 0
                 for m in path_v:
                     contPesoLocal += 1
-                    if grid[m[0]][m[1]] >= 0.999:
+                    if grid[m[1]][m[0]] == 1.0:
                         break
 
                 # armazena o local onde o feixe de laser bateu (usar o range data da particula mesmo)
-                particle.range_data.append(path_v[contPesoLocal])
+                particle.range_data.append(path_v[contPesoLocal-1])
 
-                if contPesoLocal == len(path_r):
+                if contPesoLocal == len(path_v):
                     # atribuir peso caso forem iguais
                     pesosLocais.append(1.0)
                     
                 else:
                     # calculo do peso local caso não sejam iguais
-                    pesosLocais.append(1.0 - (abs(contPesoLocal - len(path_r)) / 10))
+                    pesosLocais.append(1.0 - (abs(contPesoLocal - len(path_v)) / int(RANGE_MAX / COEF_PROP)))
 
             # calcular o peso particula - media (quanto mais proximo de 0 mais proximo o robo virtual está de um robo real)
             #conjAmostrasX[len(conjAmostrasX)-1].pesoParticula = sum(pesosLocais) / len(pesosLocais)
             particle.pesoParticula = sum(pesosLocais) / len(pesosLocais)
-            #TODO: os pesos particulas estão dando valores negativos
+            
             pesosLocais.clear
 
 
@@ -92,9 +97,9 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
         # 𝑑𝑟𝑎𝑤 𝑖 𝑤𝑖𝑡ℎ 𝑝𝑟𝑜𝑏𝑎𝑏𝑖𝑙𝑖𝑡𝑦 ∝ 𝑤_𝑡^{[i]} selecionar as amostras 𝑥^𝑘_𝑡 que possuem maior peso 𝜔_𝑡^𝑘
         # 𝑋_𝑡 ∪ 𝑥_𝑡 // adiciona a 𝑋_𝑡 as amostras de maior peso
 
-
+        #TODO: na linha 100, nao deveria ser x.pesoGlobal? remover o menor peso dentre todos os outros globais
         # remove os elementos de menor peso -> quanto menor, mais diferente é do feixe original
-        for _ in range(int(num_particles / 4)):
+        for _ in range(int(num_particles / 4)):             
             conjAmostrasX.pop(conjAmostrasX.index(min(conjAmostrasX, key=lambda x: x.pesoParticula)))
 
         # adicionar na lista n/8 particulas mediante as boas (esquema da roleta)
@@ -113,35 +118,39 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
 
             # calculo do peso da nova particula
             for k in range(len(raw_range_data)):
+
+                conjAmostrasX[len(conjAmostrasX)-1].posXReal = int((COEF_PROP * (2 * conjAmostrasX[len(conjAmostrasX)-1].posX - LARG_GRID)) / 2)
+                conjAmostrasX[len(conjAmostrasX)-1].posYReal = int((COEF_PROP * (2 * conjAmostrasX[len(conjAmostrasX)-1].posY - LARG_GRID)) / 2)
+
                 # bresenham para um feixe de laser do robo real
-                point1_r, point2_r = convertion_points(raw_range_data, raw_angle_data, theta, posX, 
+                point1_r, point2_r, _, _ = convertion_points(raw_range_data, raw_angle_data, theta, posX, 
                 posY, k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
 
                 path_r = get_line(point1_r, point2_r)
                 
                 # bresenham para um feixe de laser do robo virtual
-                point1_v, point2_v = convertion_points(raw_range_data, raw_angle_data, conjAmostrasX[len(conjAmostrasX)-1].theta, 
-                conjAmostrasX[len(conjAmostrasX)-1].posX, conjAmostrasX[len(conjAmostrasX)-1].posY, k, COEF_PROP, ALT_GRID, 
-                LARG_GRID, posXGrid, posYGrid)
+                point1_v, point2_v, _, _ = convertion_points(raw_range_data, raw_angle_data, conjAmostrasX[len(conjAmostrasX)-1].theta, 
+                conjAmostrasX[len(conjAmostrasX)-1].posXReal, conjAmostrasX[len(conjAmostrasX)-1].posYReal, k, COEF_PROP, ALT_GRID, 
+                LARG_GRID, conjAmostrasX[len(conjAmostrasX)-1].posX, conjAmostrasX[len(conjAmostrasX)-1].posY)
 
                 path_v = get_line(point1_v, point2_v)
 
-                contPesoLocal: int = 0
+                contPesoLocal = 0
                 for m in path_v:
                     contPesoLocal += 1
-                    if grid[m[0]][m[1]] >= 0.999:
+                    if grid[m[1]][m[0]] == 1.0:
                         break
 
                 # armazena o local onde o feixe de laser bateu (usar o range data da particula mesmo)
-                conjAmostrasX[len(conjAmostrasX)-1].range_data.append(path_v[contPesoLocal])
+                conjAmostrasX[len(conjAmostrasX)-1].range_data.append(path_v[contPesoLocal-1])
 
-                if contPesoLocal == len(path_r):
+                if contPesoLocal == len(path_v):
                     # atribuir peso caso forem iguais
                     pesosLocais.append(1.0)
                     
                 else:
                     # calculo do peso local caso não sejam iguais
-                    pesosLocais.append(1.0 - (abs(contPesoLocal - len(path_r)) / 10))
+                    pesosLocais.append(1.0 - (abs(contPesoLocal - len(path_v)) / int(RANGE_MAX / COEF_PROP)))
 
             # calcular o peso particula - media (quanto mais proximo de 0 mais proximo o robo virtual está de um robo real)
             conjAmostrasX[len(conjAmostrasX)-1].pesoParticula = sum(pesosLocais) / len(pesosLocais)

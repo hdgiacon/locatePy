@@ -176,7 +176,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
         print("\n Fim do mapeamento, inicio da localização \n")
 
         '''     Criação das Partículas      '''
-        '''
+        
         #TODO: acho que o tempo gasto esta aqui, o robo continua a andar enquanto as particulas são geradas
 
         # criar n particulas
@@ -218,11 +218,11 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
             ty, tz, theta = th
             #print('Orientation: ', theta)
 
-
-            
+            '''     Monte Carlo     '''
 
             conjAmostrasX = monteCarlo(conjAmostrasX, numParticles, ALT_GRID, LARG_GRID, raw_range_data, 
-                raw_angle_data, theta, LARG_GRID, ALT_GRID, posXGrid, RESOLUCAO, posYGrid, posX, posY, map)
+                raw_angle_data, theta, LARG_GRID, ALT_GRID, posXGrid, RESOLUCAO, posYGrid, posX, posY, map, 
+                RANGE_MAX)
 
             # pegar a coodenada da particula de maior peso
             conjAmostrasX.sort(key = lambda x: x.pesoGlobal)
@@ -232,7 +232,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
             path_real.append([posXGrid,posYGrid])
 
             
-
+            '''     Navegação -> base    '''
 
             navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel)
 
@@ -255,7 +255,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
                     # pro alpha (valor que vem do angle data) criar um contador e incrementar dentro desse for interno
                     alpha = raw_angle_data[index_angle]
 
-                    xL = int((RESOLUCAO * (2 * data[0] - LARG_GRID)) / 2)
+                    xL = int((RESOLUCAO * (2 * data[0] - LARG_GRID)) / 2)   #TODO: ta dando o erro de float nessa linha, deixar meia tela com o coppelia pra ver onde que o robo ta
                     yL = int((RESOLUCAO * (2 * data[1] - ALT_GRID)) / 2)
 
                     # converter a posição da particula para mapa coppelia tb
@@ -323,7 +323,6 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
                 # construir o laser data a partir do range_data e do angle_data de cada particula (angle_data não muda)         feito
 
                 particle.laser_data = np.array([particle.range_data, raw_angle_data]).T
-                #TODO: ta dando um erro aqui a partir da segunda iteração
             
                 aux_range_data.clear()
 
@@ -339,7 +338,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
             lastTime = now
 
         # end while <reamostragem>
-        '''
+
         # Parando o robô
         sim.simxSetJointTargetVelocity(clientID, r_wheel, 0, sim.simx_opmode_oneshot_wait)
         sim.simxSetJointTargetVelocity(clientID, l_wheel, 0, sim.simx_opmode_oneshot_wait)
@@ -367,7 +366,5 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
 #main(100, 96, 10)
 
-main(500, 96, 240)
+main(200, 96, 120)
 
-'''     Monte Carlo     '''
-'''     Navegação -> base    '''
