@@ -32,10 +32,10 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
             # fazer isso pro numero de feixes de lasers
             for k in range(len(raw_range_data)):
                 # bresenham para um feixe de laser do robo real
-                point1_r, point2_r, _, _ = convertion_points(raw_range_data, raw_angle_data, theta, posX, 
-                posY, k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
+                #point1_r, point2_r, _, _ = convertion_points(raw_range_data, raw_angle_data, theta, posX, 
+                #posY, k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
 
-                path_r = get_line(point1_r, point2_r)
+                #path_r = get_line(point1_r, point2_r)
                 
                 # converte a posição do robo de grid para coppelia
 
@@ -97,10 +97,10 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
         # 𝑑𝑟𝑎𝑤 𝑖 𝑤𝑖𝑡ℎ 𝑝𝑟𝑜𝑏𝑎𝑏𝑖𝑙𝑖𝑡𝑦 ∝ 𝑤_𝑡^{[i]} selecionar as amostras 𝑥^𝑘_𝑡 que possuem maior peso 𝜔_𝑡^𝑘
         # 𝑋_𝑡 ∪ 𝑥_𝑡 // adiciona a 𝑋_𝑡 as amostras de maior peso
 
-        #TODO: na linha 100, nao deveria ser x.pesoGlobal? remover o menor peso dentre todos os outros globais
+
         # remove os elementos de menor peso -> quanto menor, mais diferente é do feixe original
         for _ in range(int(num_particles / 4)):             
-            conjAmostrasX.pop(conjAmostrasX.index(min(conjAmostrasX, key=lambda x: x.pesoParticula)))
+            conjAmostrasX.pop(conjAmostrasX.index(min(conjAmostrasX, key=lambda x: x.pesoGlobal)))
 
         # adicionar na lista n/8 particulas mediante as boas (esquema da roleta)
         for _ in range(int(num_particles / 8)):
@@ -123,10 +123,10 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
                 conjAmostrasX[len(conjAmostrasX)-1].posYReal = int((COEF_PROP * (2 * conjAmostrasX[len(conjAmostrasX)-1].posY - LARG_GRID)) / 2)
 
                 # bresenham para um feixe de laser do robo real
-                point1_r, point2_r, _, _ = convertion_points(raw_range_data, raw_angle_data, theta, posX, 
-                posY, k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
+                #point1_r, point2_r, _, _ = convertion_points(raw_range_data, raw_angle_data, theta, posX, 
+                #posY, k, COEF_PROP, ALT_GRID, LARG_GRID, posXGrid, posYGrid)
 
-                path_r = get_line(point1_r, point2_r)
+                #path_r = get_line(point1_r, point2_r)
                 
                 # bresenham para um feixe de laser do robo virtual
                 point1_v, point2_v, _, _ = convertion_points(raw_range_data, raw_angle_data, conjAmostrasX[len(conjAmostrasX)-1].theta, 

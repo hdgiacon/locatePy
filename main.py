@@ -177,7 +177,6 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
         '''     Criação das Partículas      '''
         
-        #TODO: acho que o tempo gasto esta aqui, o robo continua a andar enquanto as particulas são geradas
 
         # criar n particulas
         conjAmostrasX: list[RoboVirtual] = []
@@ -194,6 +193,8 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
         lastTime = startTime
         dt = 0
         i = 0
+        aux_range_data: list[int] = []
+        index_angle: int = 0
         while tempo < numReamostragens:
             now = time.time()
             dt = now - lastTime
@@ -245,17 +246,20 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
             # inserir o tamanho do feixe encontrado no range_data desta particula       feito
 
-            aux_range_data: list[int] = []
-            index_angle: int = 0
+
+            cont = 0
 
             for particle in conjAmostrasX:
                 index_angle = 0
-                for data in particle.range_data:
-
+                cont += 1
+                #TODO: o range data de todas as particulas fica alto demais após a primeira iteração
+                for data in particle.range_data:    
+                    print("TESTE: " + str(index_angle))
+                    print("valor cont:" + str(cont))
                     # pro alpha (valor que vem do angle data) criar um contador e incrementar dentro desse for interno
                     alpha = raw_angle_data[index_angle]
 
-                    xL = int((RESOLUCAO * (2 * data[0] - LARG_GRID)) / 2)   #TODO: ta dando o erro de float nessa linha, deixar meia tela com o coppelia pra ver onde que o robo ta
+                    xL = int((RESOLUCAO * (2 * data[0] - LARG_GRID)) / 2)
                     yL = int((RESOLUCAO * (2 * data[1] - ALT_GRID)) / 2)
 
                     # converter a posição da particula para mapa coppelia tb
@@ -318,11 +322,13 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
                     aux_range_data.append(tam_feixe)
 
                 # todos os valores de tam_feixe dos estão no atributo da particula
-                particle.range_data = copy.deepcopy(aux_range_data) 
+                #particle.range_data = copy.deepcopy(aux_range_data) 
 
                 # construir o laser data a partir do range_data e do angle_data de cada particula (angle_data não muda)         feito
 
-                particle.laser_data = np.array([particle.range_data, raw_angle_data]).T
+                #particle.laser_data = np.array([particle.range_data, raw_angle_data]).T
+
+                particle.laser_data = np.array([copy.deepcopy(aux_range_data), raw_angle_data]).T
             
                 aux_range_data.clear()
 
@@ -366,5 +372,5 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
 #main(100, 96, 10)
 
-main(200, 96, 120)
+main(200, 24, 120)
 
