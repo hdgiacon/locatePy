@@ -28,6 +28,8 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
         contPesoLocal: int = 0
 
         for particle in conjAmostrasX:
+            # limpa o laser data da particula para ser preenchido de novo
+            particle.range_data.clear()
 
             # fazer isso pro numero de feixes de lasers
             for k in range(len(raw_range_data)):
@@ -47,12 +49,28 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
 
                 # bresenham para um feixe de laser do robo virtual
 
+                print("valor point1: " + str(point1_v)) if point1_v[0] >= 200 or point1_v[1] >= 200 else print("",end='')
+                print("valor point2: " + str(point2_v)) if point2_v[0] >= 200 or point1_v[1] >= 200 else print("",end='')
+
                 path_v = get_line(point1_v, point2_v)
 
                 contPesoLocal = 0
                 for m in path_v:
-                    contPesoLocal += 1
-                    if grid[m[1]][m[0]] == 1.0:
+                    contPesoLocal += 1   
+
+                    print("deu em m[0]: " + str(m[0])) if m[0] >= 200 else print("",end='')
+                    print(path_v) if m[0] >= 200 else print("",end='')
+                    
+
+                    print("deu em m[1]: " + str(m[1])) if m[1] >= 200 else print("",end='')
+                    print(path_v) if m[1] >= 200 else print("",end='')
+
+                    print("valor point1: " + str(point1_v)) if point1_v[0] >= 200 or point1_v[1] >= 200 else print("",end='')
+                    print("valor point2: " + str(point2_v)) if point2_v[0] >= 200 or point1_v[1] >= 200 else print("",end='')
+
+                    #TODO: deu um out of bounds aqui
+
+                    if grid[m[1]][m[0]] == 1.0:     
                         break
 
                 # armazena o local onde o feixe de laser bateu (usar o range data da particula mesmo)
@@ -100,7 +118,7 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
 
         # remove os elementos de menor peso -> quanto menor, mais diferente é do feixe original
         for _ in range(int(num_particles / 4)):             
-            conjAmostrasX.pop(conjAmostrasX.index(min(conjAmostrasX, key=lambda x: x.pesoGlobal)))
+            conjAmostrasX.pop(conjAmostrasX.index(min(conjAmostrasX, key=lambda x: x.pesoGlobal)))  #TODO: deu uma exceção aqui mas nao foi sempre
 
         # adicionar na lista n/8 particulas mediante as boas (esquema da roleta)
         for _ in range(int(num_particles / 8)):
@@ -129,8 +147,8 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
                 #path_r = get_line(point1_r, point2_r)
                 
                 # bresenham para um feixe de laser do robo virtual
-                point1_v, point2_v, _, _ = convertion_points(raw_range_data, raw_angle_data, conjAmostrasX[len(conjAmostrasX)-1].theta, 
-                conjAmostrasX[len(conjAmostrasX)-1].posXReal, conjAmostrasX[len(conjAmostrasX)-1].posYReal, k, COEF_PROP, ALT_GRID, 
+                point1_v, point2_v, _, _ = convertion_points_particle(raw_angle_data, conjAmostrasX[len(conjAmostrasX)-1].posXReal, 
+                conjAmostrasX[len(conjAmostrasX)-1].posYReal, conjAmostrasX[len(conjAmostrasX)-1].theta, k, COEF_PROP, ALT_GRID, 
                 LARG_GRID, conjAmostrasX[len(conjAmostrasX)-1].posX, conjAmostrasX[len(conjAmostrasX)-1].posY)
 
                 path_v = get_line(point1_v, point2_v)

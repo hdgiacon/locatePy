@@ -172,7 +172,7 @@ def convertion_points_particle(raw_angle_data: list, posX: int, posY: int, theta
     # Cálculo de todas as células de acordo com o algoritmo de Bresenham
     #line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
 
-    xi = posXGrid
+    xi = posXGrid       #TODO: creio que o problema esteja em posXGrid e posYGrid
     yi = posYGrid
     xoi = xLGrid
     yoi = yLGrid
@@ -190,11 +190,11 @@ class RoboVirtual:
     ''' comentario sobre a classe '''
     def __init__(self, _posX: int, _posY: int, _posXReal: int, _posYReal: int, _theta: float, _pesoParticula: float, 
         _pesoGlobal: float, _pesoRoleta: int, _range_data: list, _laser_data: list) -> None:
-        self.posX: int = _posX
-        self.posY: int = _posY
-        self.posXReal: int = _posXReal
-        self.posYReal: int = _posYReal
-        self.theta: float = _theta
+        self.posX: int = _posX                      # em relação a grid
+        self.posY: int = _posY                      # em relação a grid
+        self.posXReal: int = _posXReal              # em relação ao mapa coppelia
+        self.posYReal: int = _posYReal              # em relação ao mapa coppelia
+        self.theta: float = _theta                  # angulo do robo no mapa
         self.pesoParticula: float = _pesoParticula  # peso local -> media dos pesos dos feixes
         self.pesoGlobal: float = _pesoGlobal        # peso global -> peso em relação à todas as partículas
         self.pesoRoleta: int = _pesoRoleta          # peso roleta -> peso acumulado em relação à todas as partículas

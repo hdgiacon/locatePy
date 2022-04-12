@@ -251,11 +251,8 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
             for particle in conjAmostrasX:
                 index_angle = 0
-                cont += 1
-                #TODO: o range data de todas as particulas fica alto demais após a primeira iteração
+
                 for data in particle.range_data:    
-                    print("TESTE: " + str(index_angle))
-                    print("valor cont:" + str(cont))
                     # pro alpha (valor que vem do angle data) criar um contador e incrementar dentro desse for interno
                     alpha = raw_angle_data[index_angle]
 
@@ -336,7 +333,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
                 # atualizar a posição da particula apos a movimentação      feito
 
-                navegacao_particula_base(particle)
+                navegacao_particula_base(particle, LARG_GRID, ALT_GRID)
 
 
             tempo = tempo + dt
@@ -356,8 +353,8 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
         sim.simxFinish(clientID)
 
         # desenhar os path's no mapa do occupance grid
-        #print("\n Path monte Carlo: " + str(path_monte_carlo) + "\n")
-        #print("\n Path real: " + str(path_real) + "\n")
+        print("\n Path monte Carlo: " + str(path_monte_carlo) + "\n")
+        print("\n Path real: " + str(path_real) + "\n")
 
         plt.imshow(map, cmap='Greys', origin='upper', extent=(0, cols, rows, 0))
         plt.show(10)
@@ -372,5 +369,12 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
 #main(100, 96, 10)
 
-main(200, 24, 120)
+main(200, 24, 240)
 
+#TODO: salvar as posições por onde o robô real andou e setar na grid como 0.0
+
+#TODO: 100, 200, 500, 1000 particulas
+
+#TODO: testar em 2 cenarios diferentes, se der tempo 3
+
+#TODO: testar com grid 500 x 500 ou 1000 x 1000

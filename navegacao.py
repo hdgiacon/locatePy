@@ -50,7 +50,7 @@ def navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel) -> None:
     sim.simxSetJointTargetVelocity(clientID, r_wheel, wr, sim.simx_opmode_streaming + 5)
 
 
-def navegacao_particula_base(particula: RoboVirtual) -> None:
+def navegacao_particula_base(particula: RoboVirtual, LARG_GRID: int, ALT_GRID: int) -> None:
 
     laser_data = particula.laser_data
 
@@ -127,4 +127,17 @@ def navegacao_particula_base(particula: RoboVirtual) -> None:
         elif particula.theta <= 360:
             particula.posX += 2
             particula.posY += 2
+
+
+    if particula.posX >= LARG_GRID:
+        particula.posX = LARG_GRID - 1
+
+    if particula.posY >= ALT_GRID:
+        particula.posY = ALT_GRID - 1
+
+    if particula.posX < 0:
+        particula.posX = 0
+
+    if particula.posY < 0:
+        particula.posY = 0
     
