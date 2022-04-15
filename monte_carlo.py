@@ -49,26 +49,11 @@ def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid:
 
                 # bresenham para um feixe de laser do robo virtual
 
-                print("valor point1: " + str(point1_v)) if point1_v[0] >= 200 or point1_v[1] >= 200 else print("",end='')
-                print("valor point2: " + str(point2_v)) if point2_v[0] >= 200 or point1_v[1] >= 200 else print("",end='')
-
                 path_v = get_line(point1_v, point2_v)
 
                 contPesoLocal = 0
                 for m in path_v:
                     contPesoLocal += 1   
-
-                    print("deu em m[0]: " + str(m[0])) if m[0] >= 200 else print("",end='')
-                    print(path_v) if m[0] >= 200 else print("",end='')
-                    
-
-                    print("deu em m[1]: " + str(m[1])) if m[1] >= 200 else print("",end='')
-                    print(path_v) if m[1] >= 200 else print("",end='')
-
-                    print("valor point1: " + str(point1_v)) if point1_v[0] >= 200 or point1_v[1] >= 200 else print("",end='')
-                    print("valor point2: " + str(point2_v)) if point2_v[0] >= 200 or point1_v[1] >= 200 else print("",end='')
-
-                    #TODO: deu um out of bounds aqui
 
                     if grid[m[1]][m[0]] == 1.0:     
                         break

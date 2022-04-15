@@ -32,10 +32,12 @@ from monte_carlo import RoboVirtual, monteCarlo
 from navegacao import navegacao_base, navegacao_particula_base
 from auxiliares import readSensorData
 from monte_carlo import create_virtual_robot
+from sim import simxStartSimulation
+from simConst import simx_opmode_oneshot
 
 
 
-def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
+def main(map_dimension: int, numParticles: int, numReamostragens: int, nomePlot, nomeGrid, final) -> None:
 
     import typing as ty
 
@@ -59,14 +61,13 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
     rows, cols = (map_size / CELL_SIZE).astype(int)
 
-    map = np.random.uniform(low=0.0, high=1.0, size=(rows, cols))
+    mapa = np.random.uniform(low=0.0, high=1.0, size=(rows, cols))
     # inicialização das células da grid com valor de probabilidade desconhecido
-    map[::, ::] = PRIORI
+    mapa[::, ::] = PRIORI
 
     # a primeira e última célula são inicializadas para que o valor 0.5 seja o intermediário e a matriz toda cinza
-    map[0, 0] = 1
-    map[LARG_GRID-1, ALT_GRID-1] = 0
-
+    mapa[0, 0] = 1
+    mapa[LARG_GRID-1, ALT_GRID-1] = 0
 
 
     print('Program started')
@@ -149,6 +150,17 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
             posYGrid = int(ALT_GRID - ((posY / RESOLUCAO) + (ALT_GRID / 2)))
             print('PosGRID: ', posXGrid, posYGrid)
 
+            # gera o caminho do robo
+            #mapa[posYGrid][posXGrid] = 0.0    
+            #mapa[posYGrid-1][posXGrid] = 0.0
+            #mapa[posYGrid+1][posXGrid] = 0.0
+            #mapa[posYGrid][posXGrid-1] = 0.0
+            #mapa[posYGrid][posXGrid+1] = 0.0
+            #mapa[posYGrid-1][posXGrid-1] = 0.0
+            #mapa[posYGrid-1][posXGrid+1] = 0.0
+            #mapa[posYGrid+1][posXGrid-1] = 0.0
+            #mapa[posYGrid+1][posXGrid+1] = 0.0
+
             returnCode, th = sim.simxGetObjectOrientation(clientID, robotHandle, -1, 
                 sim.simx_opmode_oneshot_wait)
             ty, tz, theta = th
@@ -158,7 +170,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
             '''     Mapeamento -> Occupance Grid     '''
             # res
             ocuppance_grid(raw_range_data, raw_angle_data, theta, posX, posY, RANGE_MAX, RANGE_LIMIT, 
-                RESOLUCAO, LARG_GRID, ALT_GRID, posXGrid, posYGrid, map, PRIORI)
+                RESOLUCAO, LARG_GRID, ALT_GRID, posXGrid, posYGrid, mapa)
 
 
             '''     Navegação -> base    '''
@@ -181,7 +193,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
         # criar n particulas
         conjAmostrasX: list[RoboVirtual] = []
         for _ in range(numParticles):
-            conjAmostrasX = create_virtual_robot(conjAmostrasX, ALT_GRID, LARG_GRID, map)
+            conjAmostrasX = create_virtual_robot(conjAmostrasX, ALT_GRID, LARG_GRID, mapa)
 
 
         path_real: list[tuple[int,int]] = []
@@ -214,6 +226,17 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
             posYGrid = int(ALT_GRID - ((posY / RESOLUCAO) + (ALT_GRID / 2)))
             print('PosGRID: ', posXGrid, posYGrid)
 
+            # gera o caminho do robo (aqui talvez seja menlhor nao)
+            #mapa[posYGrid][posXGrid] = 0.0  
+            #mapa[posYGrid-1][posXGrid] = 0.0
+            #mapa[posYGrid+1][posXGrid] = 0.0
+            #mapa[posYGrid][posXGrid-1] = 0.0
+            #mapa[posYGrid][posXGrid+1] = 0.0
+            #mapa[posYGrid-1][posXGrid-1] = 0.0
+            #mapa[posYGrid-1][posXGrid+1] = 0.0
+            #mapa[posYGrid+1][posXGrid-1] = 0.0
+            #mapa[posYGrid+1][posXGrid+1] = 0.0
+
             returnCode, th = sim.simxGetObjectOrientation(clientID, robotHandle, -1, 
                 sim.simx_opmode_oneshot_wait)
             ty, tz, theta = th
@@ -222,7 +245,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
             '''     Monte Carlo     '''
 
             conjAmostrasX = monteCarlo(conjAmostrasX, numParticles, ALT_GRID, LARG_GRID, raw_range_data, 
-                raw_angle_data, theta, LARG_GRID, ALT_GRID, posXGrid, RESOLUCAO, posYGrid, posX, posY, map, 
+                raw_angle_data, theta, LARG_GRID, ALT_GRID, posXGrid, RESOLUCAO, posYGrid, posX, posY, mapa, 
                 RANGE_MAX)
 
             # pegar a coodenada da particula de maior peso
@@ -342,22 +365,43 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
         # end while <reamostragem>
 
-        # Parando o robô
-        sim.simxSetJointTargetVelocity(clientID, r_wheel, 0, sim.simx_opmode_oneshot_wait)
-        sim.simxSetJointTargetVelocity(clientID, l_wheel, 0, sim.simx_opmode_oneshot_wait)
+        if final == True:
+            # Parando o robô
+            sim.simxSetJointTargetVelocity(clientID, r_wheel, 0, sim.simx_opmode_oneshot_wait)
+            sim.simxSetJointTargetVelocity(clientID, l_wheel, 0, sim.simx_opmode_oneshot_wait)
 
-        # Parando a simulação
-        sim.simxStopSimulation(clientID, sim.simx_opmode_blocking)
+            # Parando a simulação
+            sim.simxStopSimulation(clientID, sim.simx_opmode_blocking)
 
-        # Now close the connection to CoppeliaSim:
-        sim.simxFinish(clientID)
+            # Now close the connection to CoppeliaSim:
+            sim.simxFinish(clientID)
 
         # desenhar os path's no mapa do occupance grid
         print("\n Path monte Carlo: " + str(path_monte_carlo) + "\n")
         print("\n Path real: " + str(path_real) + "\n")
 
-        plt.imshow(map, cmap='Greys', origin='upper', extent=(0, cols, rows, 0))
-        plt.show(10)
+        vet_plot1: list = []
+        vet_plot2: list = []
+        aux: tuple
+        for k in range(len(path_monte_carlo)):
+            #aux = tuple(map(lambda i, j: abs(i - j), path_monte_carlo, path_real))[0]
+            #vet_plot1.append(aux[0])
+            #vet_plot2.append(aux[1])
+
+            vet_plot1.append(abs(path_monte_carlo[k][0] - path_real[k][0]))
+            vet_plot2.append(abs(path_monte_carlo[k][1] - path_real[k][1]))
+
+        #plt.figure(figsize=(8, 8), dpi=100)
+        #plt.plot(list(range(len(vet_plot1))), vet_plot1, color = 'blue')
+        #plt.plot(list(range(len(vet_plot2))), vet_plot2, color = 'red')
+        #plt.legend(['Diferença dos valores de X','Diferença dos valores de Y'], fontsize=14)
+
+        #plt.savefig(nomePlot, bbox_inches='tight')
+        #plt.show()
+
+        plt.imshow(mapa, cmap='Greys', origin='upper', extent=(0, cols, rows, 0))
+        plt.savefig(nomeGrid, bbox_inches='tight')
+        #plt.show(10)
 
     else:
         print('Failed connecting to remote API server')
@@ -369,12 +413,18 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int) -> None:
 
 #main(100, 96, 10)
 
-main(200, 24, 240)
+
+
+#main(500, 96, 1800, "dif_96_cenario1", "grid_96_cenario1", False)
+
+#main(500, 192, 1800, "dif_192_cenario1", "grid_192_cenario1", False)
+
+#main(500, 480, 1800, "dif_480_cenario1", "grid_480_cenario1", False)
+
+main(500, 24, 1800, "dif_960_cenario1", "grid_960_cenario1", True)
 
 #TODO: salvar as posições por onde o robô real andou e setar na grid como 0.0
 
-#TODO: 100, 200, 500, 1000 particulas
+#TODO: 96, 192, 480, 960 particulas
 
-#TODO: testar em 2 cenarios diferentes, se der tempo 3
-
-#TODO: testar com grid 500 x 500 ou 1000 x 1000
+#TODO: testar em 2 cenarios diferentes

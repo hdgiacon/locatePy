@@ -1,0 +1,1 @@
+#TODO: colocar todos os algoritmos aqui dentro e dar uma limpada neles
