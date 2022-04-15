@@ -31,8 +31,8 @@ utilidade bem como os parametros necessários para o seu funcionamento.
 
 Algoritmo probabilistico de mapeamento de ambiente que produz uma matriz de crênça a respeito da localização dos obstáculos no ambiente simulado.
 
-> `ocuppance_grid(raw_range_data: list, raw_angle_data: list, theta: int, posX: int, posY: int, RANGE_MAX: int, RANGE_LIMIT: int, 
-    RESOLUCAO: float, LARG_GRID: int, ALT_GRID: int, posXGrid: int, posYGrid: int, m: np.float) -> None`
+> **`ocuppance_grid`**`(raw_range_data: list, raw_angle_data: list, theta: int, posX: int, posY: int, RANGE_MAX: int, RANGE_LIMIT: int, 
+    RESOLUCAO: float, LARG_GRID: int, ALT_GRID: int, posXGrid: int, posYGrid: int, m: np.float)`
 
 <br>
 
