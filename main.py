@@ -169,7 +169,7 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int, nomePlot,
 
             '''     Mapeamento -> Occupance Grid     '''
             # res
-            ocuppance_grid(raw_range_data, raw_angle_data, theta, posX, posY, RANGE_MAX, RANGE_LIMIT, 
+            ocuppance_grid(raw_range_data, raw_angle_data, theta, posX, posY, RANGE_MAX, 
                 RESOLUCAO, LARG_GRID, ALT_GRID, posXGrid, posYGrid, mapa)
 
 
@@ -391,12 +391,12 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int, nomePlot,
             vet_plot1.append(abs(path_monte_carlo[k][0] - path_real[k][0]))
             vet_plot2.append(abs(path_monte_carlo[k][1] - path_real[k][1]))
 
-        #plt.figure(figsize=(8, 8), dpi=100)
-        #plt.plot(list(range(len(vet_plot1))), vet_plot1, color = 'blue')
-        #plt.plot(list(range(len(vet_plot2))), vet_plot2, color = 'red')
-        #plt.legend(['Diferença dos valores de X','Diferença dos valores de Y'], fontsize=14)
+        plt.figure(figsize=(8, 8), dpi=100)
+        plt.plot(list(range(len(vet_plot1))), vet_plot1, color = 'blue')
+        plt.plot(list(range(len(vet_plot2))), vet_plot2, color = 'red')
+        plt.legend(['Diferença dos valores de X','Diferença dos valores de Y'], fontsize=14)
 
-        #plt.savefig(nomePlot, bbox_inches='tight')
+        plt.savefig(nomePlot, bbox_inches='tight')
         #plt.show()
 
         plt.imshow(mapa, cmap='Greys', origin='upper', extent=(0, cols, rows, 0))
@@ -415,13 +415,13 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int, nomePlot,
 
 
 
-#main(500, 96, 1800, "dif_96_cenario1", "grid_96_cenario1", False)
+main(500, 96, 900, "dif_96_cenario1", "grid_96_cenario1", False)
 
-#main(500, 192, 1800, "dif_192_cenario1", "grid_192_cenario1", False)
+main(500, 192, 900, "dif_192_cenario1", "grid_192_cenario1", False)
 
-#main(500, 480, 1800, "dif_480_cenario1", "grid_480_cenario1", False)
+main(500, 480, 900, "dif_480_cenario1", "grid_480_cenario1", False)
 
-main(500, 24, 1800, "dif_960_cenario1", "grid_960_cenario1", True)
+main(500, 960, 900, "dif_960_cenario1", "grid_960_cenario1", True)
 
 #TODO: salvar as posições por onde o robô real andou e setar na grid como 0.0
 

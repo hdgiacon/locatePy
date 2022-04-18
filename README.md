@@ -16,6 +16,14 @@ o simulador *CoppeliaSim*.
 
 <br>
 
+A lista de funções principais abaixo possuem uma breve descrição da sua funcionalidade, bem como dos seus parâmetros. Cada parâmetro possui o seu tipo e uma breve descrição, como mostra o exemplo a seguir:
+
+<br>
+
+> `atributo <`*`tipo`*`>` : descrição
+
+<br>
+
 <br>
 
 <br>
@@ -31,23 +39,32 @@ utilidade bem como os parametros necessários para o seu funcionamento.
 
 Algoritmo probabilistico de mapeamento de ambiente que produz uma matriz de crênça a respeito da localização dos obstáculos no ambiente simulado.
 
-> **`ocuppance_grid`**`(raw_range_data: list, raw_angle_data: list, theta: int, posX: int, posY: int, RANGE_MAX: int, RANGE_LIMIT: int, 
-    RESOLUCAO: float, LARG_GRID: int, ALT_GRID: int, posXGrid: int, posYGrid: int, m: np.float)`
+> **ocuppance_grid**`(raw_range_data, raw_angle_data, theta, posX, posY, RANGE_MAX, RANGE_LIMIT, RESOLUCAO, LARG_GRID, ALT_GRID, posXGrid, posYGrid, m)`
 
 <br>
 
-> `raw_range_data:` lista com o tamanho de cada feixe de laser
+> `raw_range_data <`*`list`*`>` : lista com o tamanho de cada feixe de laser.
 
-> `raw_angle_data:` lista com a angulação de cada feixe de laser
+> `raw_angle_data <`*`list`*`>` : lista com a angulação de cada feixe de laser.
 
-> `theta:` angulo a respeito da orientação do robô
+> `theta <`*`int`*`>` : angulo a respeito da orientação do robô.
 
-> `posX:` posição do robô no mapa do simulador em relação ao eixo *x*
+> `posX <`*`int`*`>` : posição do robô no mapa do simulador em relação ao eixo *x*.
 
-> `posY:` posição do robô no mapa do simulador em relação ao eixo *y*
+> `posY <`*`int`*`>` : posição do robô no mapa do simulador em relação ao eixo *y*.
 
-> `RANGE_MAX:` constante com o valor maximo que um feixe de laser pode ter
+> `RANGE_MAX <`*`int`*`>` : constante com o valor maximo que um feixe de laser pode ter.
 
-> `RANGE_LIMIT:` constante com o valor minimo que um feixe laser pode ter
+> `RESOLUCAO <`*`int`*`>` : é o coeficiente de proporção entre o mapa do ambiente e a *grid*.
+
+> `LARG_GRID <`*`int`*`>` : largura da matriz de *grid*.
+
+> `ALT_GRID <`*`int`*`>` : altura da matriz de *grid*.
+
+> `posXGrid <`*`int`*`>` : posição *X* onde o robô está na *grid*.
+
+> `posYGrid <`*`int`*`>` : posição *Y* onde o robô está na *grid*.
+
+> `m: <`*`np.float`*`>` : matriz *grid*.
 
 <br>
