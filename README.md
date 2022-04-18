@@ -115,7 +115,7 @@ Modelo de movimentação do robô real no simulador.
 
 > `laser_data`*`<list>`* : lista com o tamanho e angulação de cada feixe de laser do robô real.
 
-> `clientId `*`<...>`* : ...
+> `clientId `*`<int>`* : variável que representa a conexão da *simAPI*.
 
 > `i`*`<...> `* : ...
 
@@ -251,4 +251,12 @@ Cria uma partícula e a adiciona em *conjuntoAmostrasX*.
 
 > `LARG_GRID `*`<list>`* : altura da matriz *grid*.
 
-> `grid `*`<np.array>`* : matriz *grid*
+> `grid `*`<np.array>`* : matriz *grid*.
+
+<br>
+
+<br>
+
+<br>
+
+*Esta documentação está sob a licensa GNU GPL v3*
