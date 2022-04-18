@@ -110,7 +110,7 @@ def get_line(start: int, end: int) -> 'list[tuple[int, int]]':
 
 def convertion_points(raw_range_data: list, raw_angle_data: list, theta: float, posX: int, posY: int, k: int, RESOLUCAO: float, 
     ALT_GRID: int, LARG_GRID: int, posXGrid: int, posYGrid: int) -> int and int and int and int:
-    ''' comentario sobre a função '''
+    ''' Converte valores em termos do simulador para termos da grid '''
     
     xL = math.cos(raw_angle_data[k] + theta) * raw_range_data[k] + posX
     yL = math.sin(raw_angle_data[k] + theta) * raw_range_data[k] + posY
@@ -148,8 +148,9 @@ def convertion_points(raw_range_data: list, raw_angle_data: list, theta: float, 
 
 # tem o range data no maximo pras particulas
 def convertion_points_particle(raw_angle_data: list, posX: int, posY: int, theta: float, k: int, 
-    RESOLUCAO: float, ALT_GRID: int, LARG_GRID: int, posXGrid: int, posYGrid: int):
-    ''' comentario '''
+    RESOLUCAO: float, ALT_GRID: int, LARG_GRID: int, posXGrid: int, 
+    posYGrid: int) -> int and int and int and int:
+    ''' Converte os atributos de uma partícula para termos do simulador '''
     
     xL = math.cos(raw_angle_data[k] + theta) * 5 + posX
     yL = math.sin(raw_angle_data[k] + theta) * 5 + posY
@@ -172,7 +173,7 @@ def convertion_points_particle(raw_angle_data: list, posX: int, posY: int, theta
     # Cálculo de todas as células de acordo com o algoritmo de Bresenham
     #line_bresenham = np.zeros((rows, cols), dtype=np.uint8)
 
-    xi = posXGrid       #TODO: creio que o problema esteja em posXGrid e posYGrid
+    xi = posXGrid 
     yi = posYGrid
     xoi = xLGrid
     yoi = yLGrid
@@ -187,7 +188,7 @@ def convertion_points_particle(raw_angle_data: list, posX: int, posY: int, theta
 
 
 class RoboVirtual:
-    ''' comentario sobre a classe '''
+    ''' Classe para uma partícula '''
     def __init__(self, _posX: int, _posY: int, _posXReal: int, _posYReal: int, _theta: float, _pesoParticula: float, 
         _pesoGlobal: float, _pesoRoleta: int, _range_data: list, _laser_data: list) -> None:
         self.posX: int = _posX                      # em relação a grid
@@ -203,7 +204,7 @@ class RoboVirtual:
 
 
 def create_virtual_robot(conjAmostrasX: 'list[RoboVirtual]', larg_grid:int , alt_grid: int, grid: np.array) -> 'list[RoboVirtual]':
-    ''' comentario sobre a função '''
+    ''' Cria uma partícula e a adiciona em conjuntoAmostrasX '''
 
     aux_theta = randint(0, 360 - 1)
 

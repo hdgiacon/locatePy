@@ -244,8 +244,8 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int, nomePlot,
 
             '''     Monte Carlo     '''
 
-            conjAmostrasX = monteCarlo(conjAmostrasX, numParticles, ALT_GRID, LARG_GRID, raw_range_data, 
-                raw_angle_data, theta, LARG_GRID, ALT_GRID, posXGrid, RESOLUCAO, posYGrid, posX, posY, mapa, 
+            conjAmostrasX = monteCarlo(conjAmostrasX, numParticles, raw_range_data, 
+                raw_angle_data, LARG_GRID, ALT_GRID, RESOLUCAO, mapa, 
                 RANGE_MAX)
 
             # pegar a coodenada da particula de maior peso

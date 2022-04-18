@@ -7,10 +7,10 @@ from auxiliares import RoboVirtual, convertion_points_particle, create_virtual_r
 
     
 
-def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, alt_grid: int, larg_grid: int, raw_range_data: list, 
-    raw_angle_data: list, theta: int, LARG_GRID: int, ALT_GRID: int, posXGrid: int, COEF_PROP: float, posYGrid: int,
-    posX: int, posY: int, grid: np.array, RANGE_MAX: int) -> 'list[RoboVirtual]':
-    ''' comentario sobre monte carlo '''
+def monteCarlo(conjAmostrasX: 'list[RoboVirtual]', num_particles: int, raw_range_data: list, 
+    raw_angle_data: list, LARG_GRID: int, ALT_GRID: int, COEF_PROP: float,
+    grid: np.array, RANGE_MAX: int) -> 'list[RoboVirtual]':
+    ''' Algoritmo de localização de robôs baseado no espalhamento de partículas pelo mapa a fim de encontrar aquela que mais se assemelha à sua leitura real. '''
 
 
     if num_particles % 4 == 0 and num_particles % 8 == 0:

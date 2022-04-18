@@ -15,7 +15,7 @@ import numpy as np
 from auxiliares import RoboVirtual
 
 def navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel) -> None:
-    ''' comentario sobre a função '''
+    ''' Modelo de movimentação do robô real no simulador '''
 
     v = 0
     w = np.deg2rad(0)
@@ -51,6 +51,7 @@ def navegacao_base(laser_data, clientID, i, r, L, l_wheel, r_wheel) -> None:
 
 
 def navegacao_particula_base(particula: RoboVirtual, LARG_GRID: int, ALT_GRID: int) -> None:
+    ''' Modelo de movimentação das partículas baseado no ambiente do simulador '''
 
     laser_data = particula.laser_data
 
