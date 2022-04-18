@@ -117,11 +117,11 @@ Modelo de movimentação do robô real no simulador.
 
 > `clientId `*`<int>`* : variável que representa a conexão da *simAPI*.
 
-> `i`*`<...> `* : ...
+> `i`*`<int> `* : idenficicação do sensor atual
 
-> `r`*`<...> `* : ...
+> `r`*`<float> `* : variável para cinemática do robô
 
-> `L`*`<...> `* : ...
+> `L`*`<float> `* : variável para cinemática do robô
 
 > `l_wheel `*`<float>`* : variável que referencia a roda esquerda do robô real no simulador.
 
@@ -146,6 +146,26 @@ Modelo de movimentação das partículas baseado no ambiente do simulador.
 > `LARG_GRID `*`<int>`* : largura da matriz *grid*.
 
 > `ALT_GRID `*`<int>`* : altura da matriz *grid*.
+
+<br>
+
+<br>
+
+<br>
+
+### Leitura de Sensores
+
+retorna a distancia e o angulo de cada sensor do robô.
+
+> **leitura_sensores** `(clientId, range_data_signal_id, angle_data_signal_id)`
+
+<br>
+
+> `clientId `*`<int>`* : variável que representa a conexão da *simAPI*.
+
+> `range_data_signal_id`*`<string>`* : identificador da lista de tamanho de feixes do laser.
+
+> `angle_data_signal_id`*`<string>`* : identificador na lista de angulações de feixes do laser
 
 <br>
 
