@@ -140,9 +140,9 @@ def main(map_dimension: int, numParticles: int, numReamostragens: int, nomePlot,
             ty, tz, theta = th
 
 
-            '''     Mapeamento -> Occupance Grid     '''
+            '''     Mapeamento -> Occupancy Grid     '''
 
-            ocuppance_grid(raw_range_data, raw_angle_data, theta, posX, posY, RANGE_MAX, 
+            ocuppancy_grid(raw_range_data, raw_angle_data, theta, posX, posY, RANGE_MAX, 
                 RESOLUCAO, LARG_GRID, ALT_GRID, posXGrid, posYGrid, mapa)
 
 

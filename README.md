@@ -35,11 +35,11 @@ utilidade bem como os parametros necessários para o seu funcionamento.
 
 <br>
 
-### Occupance Grid
+### Occupancy Grid
 
 Algoritmo probabilistico de mapeamento de ambiente que produz uma matriz de crênça a respeito da localização dos obstáculos no ambiente simulado.
 
-> **ocuppance_grid** `(raw_range_data, raw_angle_data, theta, posX, posY, RANGE_MAX, RANGE_LIMIT, RESOLUCAO, LARG_GRID, ALT_GRID, posXGrid, posYGrid, m)`
+> **ocuppancy_grid** `(raw_range_data, raw_angle_data, theta, posX, posY, RANGE_MAX, RANGE_LIMIT, RESOLUCAO, LARG_GRID, ALT_GRID, posXGrid, posYGrid, m)`
 
 <br>
 
